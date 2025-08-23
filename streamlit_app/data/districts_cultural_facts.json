@@ -1,0 +1,64 @@
+
+
+{
+  "Mitte": {
+    "blurb": "Berlin’s central district, home to iconic landmarks like the Brandenburg Gate, Museum Island, and Alexanderplatz. A cultural, political, and historic heart of the city.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Friedrichshain‑Kreuzberg": {
+    "blurb": "Creative and alternative energy defines Friedrichshain‑Kreuzberg. Known for street art, nightlife, multicultural food, and the East Side Gallery.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Pankow": {
+    "blurb": "From family‑friendly Prenzlauer Berg with leafy squares to quiet northern villages, Pankow mixes historic charm with green escapes.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Charlottenburg‑Wilmersdorf": {
+    "blurb": "Elegant boulevards, Charlottenburg Palace, upscale shops, and cultural institutions like Deutsche Oper define this west Berlin district.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Spandau": {
+    "blurb": "Spandau blends a medieval old town, riverside promenades, and the historic Spandau Citadel. A city‑within‑a‑city atmosphere on Berlin’s western edge.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Steglitz‑Zehlendorf": {
+    "blurb": "Leafy and affluent, with lakes like Wannsee, Grunewald forest, and cultural gems such as the Botanical Garden and Free University.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Tempelhof‑Schöneberg": {
+    "blurb": "A diverse district mixing historic Rathaus Schöneberg, LGBTQ+ heritage around Nollendorfplatz, and the vast open space of Tempelhofer Feld.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Neukölln": {
+    "blurb": "Dynamic and multicultural, with bustling Sonnenallee, Landwehrkanal strolls, and a thriving arts and nightlife scene.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Treptow‑Köpenick": {
+    "blurb": "Berlin’s greenest district, rich in lakes and forests. Köpenick’s old town and castle offer charm by the water.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Marzahn‑Hellersdorf": {
+    "blurb": "Known for vast housing estates, green spaces, and the Gardens of the World, showcasing landscapes from across the globe.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Lichtenberg": {
+    "blurb": "A mix of East German heritage and modern life, with highlights like the Stasi Museum, Tierpark Berlin, and growing creative spaces.",
+    "image_path": "",
+    "source": "manual"
+  },
+  "Reinickendorf": {
+    "blurb": "Northern Berlin district with Tegeler See, Frohnau garden city, and village cores that blend suburban calm with access to forests and lakes.",
+    "image_path": "",
+    "source": "manual"
+  }
+}

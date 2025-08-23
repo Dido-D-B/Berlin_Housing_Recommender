@@ -1,0 +1,659 @@
+{
+    "Neukölln—Neukölln": {
+      "bezirk": "Neukölln",
+      "ortsteil": "Neukölln",
+      "blurb": "Historic core of the borough with dense Gründerzeit blocks, a diverse food scene along Sonnenallee and Karl‑Marx‑Straße, and relaxed canal strolls by the Landwehrkanal and Neuköllner Schifffahrtskanal.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Pankow—Prenzlauer Berg": {
+      "bezirk": "Pankow",
+      "ortsteil": "Prenzlauer Berg",
+      "blurb": "Leafy boulevards, restored Altbau facades, and café culture; family‑friendly squares like Kollwitzplatz and Sunday flea markets near Mauerpark.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Friedrichshain‑Kreuzberg—Kreuzberg": {
+      "bezirk": "Friedrichshain‑Kreuzberg",
+      "ortsteil": "Kreuzberg",
+      "blurb": "Famous for its alternative spirit, street art, and multicultural eateries, Kreuzberg is home to Görlitzer Park, bustling markets, and a vibrant nightlife scene along Oranienstraße and around Kottbusser Tor.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Mitte—Mitte": {
+      "bezirk": "Mitte",
+      "ortsteil": "Mitte",
+      "blurb": "The heart of Berlin, Mitte boasts world-class museums on Museum Island, iconic landmarks like the Brandenburg Gate, and a lively mix of shopping, galleries, and historic sites along Unter den Linden.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Charlottenburg‑Wilmersdorf—Charlottenburg": {
+      "bezirk": "Charlottenburg‑Wilmersdorf",
+      "ortsteil": "Charlottenburg",
+      "blurb": "Elegant avenues, the grand Charlottenburg Palace, and upscale boutiques define Charlottenburg, while Savignyplatz’s cafés and Kantstraße’s Asian restaurants add cosmopolitan flair to this west Berlin neighborhood.",
+      "image_path": "",
+      "source": "manual"
+    }
+    ,
+    "Friedrichshain‑Kreuzberg—Friedrichshain": {
+      "bezirk": "Friedrichshain‑Kreuzberg",
+      "ortsteil": "Friedrichshain",
+      "blurb": "Known for its nightlife, street art, and the East Side Gallery, Friedrichshain blends post-industrial vibes with creative spaces, bustling Boxhagener Platz, and Spree riverside hangouts like Holzmarkt.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Tempelhof‑Schöneberg—Schöneberg": {
+      "bezirk": "Tempelhof‑Schöneberg",
+      "ortsteil": "Schöneberg",
+      "blurb": "Schöneberg is a lively, diverse area with Art Deco facades, the historic Rathaus Schöneberg, bustling Winterfeldtplatz markets, and a rich LGBTQ+ history centered around Nollendorfplatz.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Treptow‑Köpenick—Alt‑Treptow": {
+      "bezirk": "Treptow‑Köpenick",
+      "ortsteil": "Alt‑Treptow",
+      "blurb": "Alt‑Treptow offers riverside parks, the sprawling Treptower Park, Soviet War Memorial, and easygoing cafés. It’s a green escape with quick access to Kreuzberg’s urban energy.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Lichtenberg—Karlshorst": {
+      "bezirk": "Lichtenberg",
+      "ortsteil": "Karlshorst",
+      "blurb": "Karlshorst is known for its horse racing track, leafy residential streets, and Soviet‑era history. It’s quieter, with a suburban feel and excellent access to Tierpark Berlin.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Reinickendorf—Tegel": {
+      "bezirk": "Reinickendorf",
+      "ortsteil": "Tegel",
+      "blurb": "Tegel is famed for its lakeside promenade, the vast Tegeler See, forested parks, and relaxed small-town atmosphere, making it a favorite for outdoor recreation and boat trips.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Spandau—Spandau": {
+      "bezirk": "Spandau",
+      "ortsteil": "Spandau",
+      "blurb": "Spandau combines a medieval old town, the Renaissance‑era citadel, and riverside walks along the Havel. It feels like a city within a city, with markets and festivals year‑round.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Steglitz‑Zehlendorf—Zehlendorf": {
+      "bezirk": "Steglitz‑Zehlendorf",
+      "ortsteil": "Zehlendorf",
+      "blurb": "Zehlendorf is leafy and tranquil, with grand villas, lakes like Schlachtensee, and the Grunewald forest nearby. It’s favored for its village-like charm and proximity to nature.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Marzahn‑Hellersdorf—Marzahn": {
+      "bezirk": "Marzahn‑Hellersdorf",
+      "ortsteil": "Marzahn",
+      "blurb": "Marzahn features Soviet‑era high-rises, vast green spaces, and the Gardens of the World park, offering global themed gardens and panoramic views from the Kienberg cable car.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Marzahn‑Hellersdorf—Hellersdorf": {
+      "bezirk": "Marzahn‑Hellersdorf",
+      "ortsteil": "Hellersdorf",
+      "blurb": "Hellersdorf offers affordable housing, family-friendly parks, and community gardens. It’s a quieter, residential area, with easy access to the green outskirts and nearby Wuhletal trails.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Pankow—Weißensee": {
+      "bezirk": "Pankow",
+      "ortsteil": "Weißensee",
+      "blurb": "Weißensee is known for its peaceful lake, the historic open-air Strandbad, and a creative arts scene centered around the Kunsthochschule. Tree-lined streets and quiet parks offer a relaxed pace.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Mitte—Wedding": {
+      "bezirk": "Mitte",
+      "ortsteil": "Wedding",
+      "blurb": "Wedding is a multicultural hub with vibrant street life, diverse food options, and creative spaces like Silent Green. Parks such as Volkspark Humboldthain offer green retreats amid urban bustle.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Mitte—Moabit": {
+      "bezirk": "Mitte",
+      "ortsteil": "Moabit",
+      "blurb": "Moabit features leafy canals, the historic Arminiusmarkthalle, and a mix of old and new Berlin. Its multicultural vibe and proximity to Tiergarten make it lively yet surprisingly tranquil.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Charlottenburg‑Wilmersdorf—Wilmersdorf": {
+      "bezirk": "Charlottenburg‑Wilmersdorf",
+      "ortsteil": "Wilmersdorf",
+      "blurb": "Wilmersdorf offers elegant residential streets, cozy cafés, and the historic Schaubühne theater. Its relaxed pace, green squares, and proximity to Kurfürstendamm make it a sought-after west Berlin address.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Tempelhof‑Schöneberg—Tempelhof": {
+      "bezirk": "Tempelhof‑Schöneberg",
+      "ortsteil": "Tempelhof",
+      "blurb": "Tempelhof is known for the vast Tempelhofer Feld, a former airport turned urban park. Locals enjoy cycling, picnics, and gardening, while historic buildings recall Berlin’s aviation past.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Treptow‑Köpenick—Köpenick": {
+      "bezirk": "Treptow‑Köpenick",
+      "ortsteil": "Köpenick",
+      "blurb": "Köpenick charms with its riverside old town, baroque castle, and lively marina. Surrounded by lakes and forests, it offers a picturesque escape with a small-town feel in Berlin’s southeast.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Lichtenberg—Lichtenberg": {
+      "bezirk": "Lichtenberg",
+      "ortsteil": "Lichtenberg",
+      "blurb": "Lichtenberg blends history and modernity, with the Stasi Museum, family-friendly parks, and East German architecture. The Rummelsburg waterfront and animal encounters at Tierpark Berlin are local highlights.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Steglitz‑Zehlendorf—Steglitz": {
+      "bezirk": "Steglitz‑Zehlendorf",
+      "ortsteil": "Steglitz",
+      "blurb": "Steglitz is a classic shopping destination with Schlossstraße’s boutiques, leafy Fichtenberg, and the tranquil Botanical Garden. Its mix of urban convenience and green spaces appeals to families and students.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Reinickendorf—Reinickendorf": {
+      "bezirk": "Reinickendorf",
+      "ortsteil": "Reinickendorf",
+      "blurb": "Reinickendorf offers suburban calm, traditional village cores, and easy access to Tegeler Forst’s woodlands. The Märkisches Viertel stands out for its modernist housing and community spirit.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Neukölln—Britz": {
+      "bezirk": "Neukölln",
+      "ortsteil": "Britz",
+      "blurb": "Britz is known for its historic Britzer Garten, the UNESCO-listed Hufeisensiedlung, and peaceful residential streets. It’s a green, family-friendly enclave with annual events like the Britzer Baumblüte.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Pankow—Pankow": {
+      "bezirk": "Pankow",
+      "ortsteil": "Pankow",
+      "blurb": "Pankow features grand Wilhelminian villas, the expansive Bürgerpark, and a relaxed, leafy atmosphere. Its historic town center and proximity to Schlosspark Schönhausen attract families and nature lovers.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Friedrichshain‑Kreuzberg—Alt‑Treptow": {
+      "bezirk": "Friedrichshain‑Kreuzberg",
+      "ortsteil": "Alt‑Treptow",
+      "blurb": "Alt‑Treptow is a green, riverside area, home to Treptower Park and the Soviet War Memorial. Its laid-back cafés and proximity to Kreuzberg make it a favored spot for creative minds.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Friedrichshain‑Kreuzberg—Oberbaum City": {
+      "bezirk": "Friedrichshain‑Kreuzberg",
+      "ortsteil": "Oberbaum City",
+      "blurb": "Oberbaum City features striking red-brick industrial architecture, modern offices, and riverside walkways along the Spree. Its creative scene thrives near the iconic Oberbaum Bridge and Mediaspree developments.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Mitte—Tiergarten": {
+      "bezirk": "Mitte",
+      "ortsteil": "Tiergarten",
+      "blurb": "Tiergarten is Berlin’s central parkland, featuring lush meadows, the Berlin Zoo, and cultural highlights like the Philharmonie. The Victory Column and lakeside cafés draw visitors year-round.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Mitte—Hansaviertel": {
+      "bezirk": "Mitte",
+      "ortsteil": "Hansaviertel",
+      "blurb": "Hansaviertel is renowned for its postwar modernist architecture, leafy avenues, and proximity to Tiergarten park. It’s a tranquil, architecturally significant neighborhood with a unique 1950s spirit.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Charlottenburg‑Wilmersdorf—Grunewald": {
+      "bezirk": "Charlottenburg‑Wilmersdorf",
+      "ortsteil": "Grunewald",
+      "blurb": "Grunewald is known for its vast forest, exclusive villas, and the Grunewaldturm. Residents enjoy serene lakes, woodland trails, and a peaceful escape from the city’s urban pace.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Charlottenburg‑Wilmersdorf—Halensee": {
+      "bezirk": "Charlottenburg‑Wilmersdorf",
+      "ortsteil": "Halensee",
+      "blurb": "Halensee is a compact, upscale locality bordering Kurfürstendamm, featuring the tranquil Halensee lake, elegant residential buildings, and easy access to shopping and dining in Berlin’s west.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Tempelhof‑Schöneberg—Friedenau": {
+      "bezirk": "Tempelhof‑Schöneberg",
+      "ortsteil": "Friedenau",
+      "blurb": "Friedenau is beloved for its quiet, leafy streets, Art Nouveau facades, and literary history. Its village-like charm and local markets make it a sought-after residential neighborhood.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Tempelhof‑Schöneberg—Mariendorf": {
+      "bezirk": "Tempelhof‑Schöneberg",
+      "ortsteil": "Mariendorf",
+      "blurb": "Mariendorf is known for its historic harness racing track, peaceful residential areas, and the green Volkspark Mariendorf. It offers suburban tranquility with easy city connections.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Treptow‑Köpenick—Oberschöneweide": {
+      "bezirk": "Treptow‑Köpenick",
+      "ortsteil": "Oberschöneweide",
+      "blurb": "Oberschöneweide boasts a fascinating industrial heritage, riverside lofts, and the Hochschule für Technik und Wirtschaft. Its creative spaces and Spree-side promenades attract students and artists alike.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Treptow‑Köpenick—Grünau": {
+      "bezirk": "Treptow‑Köpenick",
+      "ortsteil": "Grünau",
+      "blurb": "Grünau is a waterside haven, famous for its regatta course, forested areas, and lakeside recreation. Boating, cycling, and nature walks define life in this southeastern Berlin retreat.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Lichtenberg—Fennpfuhl": {
+      "bezirk": "Lichtenberg",
+      "ortsteil": "Fennpfuhl",
+      "blurb": "Fennpfuhl is characterized by its high-rise Plattenbau, green parks, and the scenic Fennpfuhl lake. It offers affordable living and a strong sense of community in eastern Berlin.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Lichtenberg—Rummelsburg": {
+      "bezirk": "Lichtenberg",
+      "ortsteil": "Rummelsburg",
+      "blurb": "Rummelsburg features waterfront living along the Rummelsburger See, converted industrial lofts, and tranquil green spaces. It’s a growing area with a mix of urban and natural appeal.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Steglitz‑Zehlendorf—Dahlem": {
+      "bezirk": "Steglitz‑Zehlendorf",
+      "ortsteil": "Dahlem",
+      "blurb": "Dahlem is renowned for its grand villas, prestigious Free University, and world-class museums. Its leafy streets and botanical gardens make it a cultural and academic hotspot.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Reinickendorf—Hermsdorf": {
+      "bezirk": "Reinickendorf",
+      "ortsteil": "Hermsdorf",
+      "blurb": "Hermsdorf offers a village-like feel with charming houses, access to Tegeler Forst, and a vibrant local arts scene. Its tranquil atmosphere is perfect for nature lovers and families.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Spandau—Haselhorst": {
+      "bezirk": "Spandau",
+      "ortsteil": "Haselhorst",
+      "blurb": "Haselhorst is known for its riverside parks, historic citadel views, and modernist housing estates. It’s a quiet, green neighborhood with excellent transport links and industrial heritage.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Spandau—Wilhelmstadt": {
+      "bezirk": "Spandau",
+      "ortsteil": "Wilhelmstadt",
+      "blurb": "Wilhelmstadt stretches along the Havel, offering scenic waterfront promenades and a blend of historic villas and postwar housing. Its parks and relaxed pace make it a hidden gem for families.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Spandau—Gatow": {
+      "bezirk": "Spandau",
+      "ortsteil": "Gatow",
+      "blurb": "Gatow is a tranquil, semi-rural locality with old farmhouses, lakeside views, and the historic Luftwaffe Museum. Its wide-open spaces and village feel attract those seeking peace near Berlin’s edge.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Spandau—Kladow": {
+      "bezirk": "Spandau",
+      "ortsteil": "Kladow",
+      "blurb": "Kladow is a leafy, lakeside retreat with marina life, waterfront cafés, and ferry connections to Wannsee. Its nature reserves and village charm offer a relaxed escape from urban bustle.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Spandau—Falkenhagener Feld": {
+      "bezirk": "Spandau",
+      "ortsteil": "Falkenhagener Feld",
+      "blurb": "Falkenhagener Feld features spacious high-rise estates, abundant green spaces, and playgrounds. Its multicultural community, shopping centers, and proximity to Spandauer Forst appeal to young families.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Spandau—Siemensstadt": {
+      "bezirk": "Spandau",
+      "ortsteil": "Siemensstadt",
+      "blurb": "Siemensstadt is famed for its industrial heritage, Bauhaus-style housing estates, and the iconic Siemens factories. Green corridors and proximity to Jungfernheide park balance urban living with nature.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Marzahn-Hellersdorf—Biesdorf": {
+      "bezirk": "Marzahn-Hellersdorf",
+      "ortsteil": "Biesdorf",
+      "blurb": "Biesdorf is known for its spacious gardens, the historic Schloss Biesdorf, and tranquil residential streets. Its parks and village-like charm make it ideal for peaceful suburban living.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Marzahn-Hellersdorf—Kaulsdorf": {
+      "bezirk": "Marzahn-Hellersdorf",
+      "ortsteil": "Kaulsdorf",
+      "blurb": "Kaulsdorf offers picturesque lakes, detached houses with gardens, and a relaxed small-town feel. Locals enjoy weekend walks in Wuhlepark and a strong sense of neighborhood community.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Marzahn-Hellersdorf—Mahlsdorf": {
+      "bezirk": "Marzahn-Hellersdorf",
+      "ortsteil": "Mahlsdorf",
+      "blurb": "Mahlsdorf is Berlin’s easternmost locality, known for its historic village core, single-family homes, and leafy avenues. The Gründerzeitmuseum and peaceful parks draw families seeking space and quiet.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Marzahn-Hellersdorf—Hellersdorf-Nord": {
+      "bezirk": "Marzahn-Hellersdorf",
+      "ortsteil": "Hellersdorf-Nord",
+      "blurb": "Hellersdorf-Nord features modern housing estates, playgrounds, and green courtyards. Its affordable rents, good schools, and proximity to the Wuhletal green corridor attract young families and students.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Marzahn-Hellersdorf—Hellersdorf-Süd": {
+      "bezirk": "Marzahn-Hellersdorf",
+      "ortsteil": "Hellersdorf-Süd",
+      "blurb": "Hellersdorf-Süd blends postwar apartment blocks with newer developments and parks. Community centers, shopping options, and easy access to the countryside make it a practical, family-friendly area.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Mitte—Gesundbrunnen": {
+      "bezirk": "Mitte",
+      "ortsteil": "Gesundbrunnen",
+      "blurb": "Gesundbrunnen is a lively area where multicultural markets, historic Humboldthain park, and urban street art meet. The neighborhood offers vibrant shopping, U-Bahn links, and a mix of old and new Berlin.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Charlottenburg-Wilmersdorf—Charlottenburg-Nord": {
+      "bezirk": "Charlottenburg-Wilmersdorf",
+      "ortsteil": "Charlottenburg-Nord",
+      "blurb": "Charlottenburg-Nord is a peaceful residential area with postwar housing, green courtyards, and the striking Plötzensee Memorial. Its proximity to Tegel and excellent transit make it convenient and accessible.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Charlottenburg-Wilmersdorf—Westend": {
+      "bezirk": "Charlottenburg-Wilmersdorf",
+      "ortsteil": "Westend",
+      "blurb": "Westend features leafy avenues, the Olympic Stadium, and tranquil villas. Its quiet charm, classic architecture, and access to Grunewald forest make it a desirable spot for families and sports fans.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Charlottenburg-Wilmersdorf—Schmargendorf": {
+      "bezirk": "Charlottenburg-Wilmersdorf",
+      "ortsteil": "Schmargendorf",
+      "blurb": "Schmargendorf is a village-like locality with historic brick buildings, quiet streets, and a small-town feel. Its cozy cafés, local shops, and proximity to Grunewald attract those seeking tranquility.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Steglitz-Zehlendorf—Lankwitz": {
+      "bezirk": "Steglitz-Zehlendorf",
+      "ortsteil": "Lankwitz",
+      "blurb": "Lankwitz offers a suburban atmosphere with parks, schools, and family homes. Its relaxed pace, local markets, and easy S-Bahn access make it popular with families and commuters alike.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Steglitz-Zehlendorf—Lichterfelde": {
+      "bezirk": "Steglitz-Zehlendorf",
+      "ortsteil": "Lichterfelde",
+      "blurb": "Lichterfelde is known for its elegant 19th-century villas, tree-lined streets, and the Botanical Garden. Its village squares and tranquil charm appeal to those seeking a slower pace within the city.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Steglitz-Zehlendorf—Nikolassee": {
+      "bezirk": "Steglitz-Zehlendorf",
+      "ortsteil": "Nikolassee",
+      "blurb": "Nikolassee boasts grand homes, lush gardens, and proximity to lakes like Schlachtensee and Wannsee. The area is prized for its peace, nature, and exclusive residential streets.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Steglitz-Zehlendorf—Wannsee": {
+      "bezirk": "Steglitz-Zehlendorf",
+      "ortsteil": "Wannsee",
+      "blurb": "Wannsee is famed for its lakeside beaches, historic villas, and the Glienicke Bridge. Boating, cycling, and waterside cafés define life in this scenic, green southwestern corner of Berlin.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Tempelhof-Schöneberg—Marienfelde": {
+      "bezirk": "Tempelhof-Schöneberg",
+      "ortsteil": "Marienfelde",
+      "blurb": "Marienfelde blends village history with modern housing, featuring the Marienfelde Refugee Center Museum and green fields. Its quiet streets and suburban feel attract families seeking space and calm.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Tempelhof-Schöneberg—Lichtenrade": {
+      "bezirk": "Tempelhof-Schöneberg",
+      "ortsteil": "Lichtenrade",
+      "blurb": "Lichtenrade is a southern suburb with a village core, cozy cafés, and green surroundings. Its small-town atmosphere, historic church, and easy access to Brandenburg make it a peaceful retreat.",
+      "image_path": "",
+      "source": "manual"
+    },
+    "Neukölln—Buckow": {
+  "bezirk": "Neukölln",
+  "ortsteil": "Buckow",
+  "blurb": "Buckow mixes postwar housing with small gardens and quiet streets. Local markets, community clubs, and green pockets give it a calm, suburban character in the city’s south.",
+  "image_path": "",
+  "source": "manual"
+},
+"Neukölln—Rudow": {
+  "bezirk": "Neukölln",
+  "ortsteil": "Rudow",
+  "blurb": "Rudow has a village core, single‑family homes, and open fields toward Brandenburg. Popular cycling paths and allotment gardens make weekends feel refreshingly rural.",
+  "image_path": "",
+  "source": "manual"
+},
+"Neukölln—Gropiusstadt": {
+  "bezirk": "Neukölln",
+  "ortsteil": "Gropiusstadt",
+  "blurb": "Gropiusstadt is a landmark modernist estate by Walter Gropius: tall residential blocks, wide courtyards, and playgrounds with great U‑Bahn access and affordable living.",
+  "image_path": "",
+  "source": "manual"
+},
+
+"Pankow—Niederschönhausen": {
+  "bezirk": "Pankow",
+  "ortsteil": "Niederschönhausen",
+  "blurb": "Niederschönhausen features 19th‑century villas, leafy avenues, and Schlosspark Pankow. It’s tranquil, elegant, and well‑connected to the green north of Berlin.",
+  "image_path": "",
+  "source": "manual"
+},
+"Pankow—Rosenthal": {
+  "bezirk": "Pankow",
+  "ortsteil": "Rosenthal",
+  "blurb": "Rosenthal feels village‑like with low‑rise houses, gardens, and quiet lanes. Community festivals and nearby fields give it a relaxed, small‑town charm.",
+  "image_path": "",
+  "source": "manual"
+},
+"Pankow—Wilhelmsruh": {
+  "bezirk": "Pankow",
+  "ortsteil": "Wilhelmsruh",
+  "blurb": "Wilhelmsruh combines compact residential streets with pocket parks and lakeside paths. It’s peaceful, with quick S‑Bahn links to central Berlin.",
+  "image_path": "",
+  "source": "manual"
+},
+"Pankow—Blankenfelde": {
+  "bezirk": "Pankow",
+  "ortsteil": "Blankenfelde",
+  "blurb": "Blankenfelde offers fields, farms, and nature reserves at the city’s edge. Ideal for cycling and wide‑open skies, it retains a distinctly rural feel.",
+  "image_path": "",
+  "source": "manual"
+},
+"Pankow—Blankenburg": {
+  "bezirk": "Pankow",
+  "ortsteil": "Blankenburg",
+  "blurb": "Blankenburg is a quiet, low‑density area with garden colonies and family homes. Calm streets and local shops make everyday life pleasantly unhurried.",
+  "image_path": "",
+  "source": "manual"
+},
+"Pankow—Heinersdorf": {
+  "bezirk": "Pankow",
+  "ortsteil": "Heinersdorf",
+  "blurb": "Heinersdorf blends postwar houses with community gardens and playgrounds. Its residential calm and tram links appeal to families seeking space.",
+  "image_path": "",
+  "source": "manual"
+},
+"Pankow—Karow": {
+  "bezirk": "Pankow",
+  "ortsteil": "Karow",
+  "blurb": "Karow features new builds, schools, and ponds within the Karower Teiche nature reserve. It’s green, family‑oriented, and popular with commuters.",
+  "image_path": "",
+  "source": "manual"
+},
+"Pankow—Buch": {
+  "bezirk": "Pankow",
+  "ortsteil": "Buch",
+  "blurb": "Buch is known for its hospital campus, historic sanatorium buildings, and vast forests. Lakes, meadows, and bike trails define this northern gateway to nature.",
+  "image_path": "",
+  "source": "manual"
+},
+"Pankow—Französisch Buchholz": {
+  "bezirk": "Pankow",
+  "ortsteil": "Französisch Buchholz",
+  "blurb": "Französisch Buchholz keeps a village center, churches, and farmsteads amid newer housing. Quiet streets and fields nearby make it feel pleasantly pastoral.",
+  "image_path": "",
+  "source": "manual"
+},
+
+"Lichtenberg—Friedrichsfelde": {
+  "bezirk": "Lichtenberg",
+  "ortsteil": "Friedrichsfelde",
+  "blurb": "Friedrichsfelde mixes Siedlung housing, parks, and the Tierpark Berlin at its heart. Broad avenues and tranquil squares suit a slower daily rhythm.",
+  "image_path": "",
+  "source": "manual"
+},
+
+"Reinickendorf—Frohnau": {
+  "bezirk": "Reinickendorf",
+  "ortsteil": "Frohnau",
+  "blurb": "Frohnau is a garden‑city gem with grand houses, pine forests, and a charming station square. Its elegant calm and nature access are unrivaled in the north.",
+  "image_path": "",
+  "source": "manual"
+},
+"Reinickendorf—Heiligensee": {
+  "bezirk": "Reinickendorf",
+  "ortsteil": "Heiligensee",
+  "blurb": "Heiligensee borders wide waters and forests, with boat docks and sandy coves. Village streets and timbered houses evoke an easygoing lakeside lifestyle.",
+  "image_path": "",
+  "source": "manual"
+},
+"Reinickendorf—Konradshöhe": {
+  "bezirk": "Reinickendorf",
+  "ortsteil": "Konradshöhe",
+  "blurb": "Konradshöhe sits on the Havel with wooded trails and river views. Detached homes, marinas, and beachy spots give it a holiday vibe year‑round.",
+  "image_path": "",
+  "source": "manual"
+},
+"Reinickendorf—Wittenau": {
+  "bezirk": "Reinickendorf",
+  "ortsteil": "Wittenau",
+  "blurb": "Wittenau combines postwar housing, shopping streets, and civic centers. U‑Bahn and S‑Bahn lines make it a convenient hub in the district’s middle.",
+  "image_path": "",
+  "source": "manual"
+},
+"Reinickendorf—Märkisches Viertel": {
+  "bezirk": "Reinickendorf",
+  "ortsteil": "Märkisches Viertel",
+  "blurb": "Märkisches Viertel is a signature high‑rise estate with generous green courtyards, sports areas, and cultural centers—an affordable, well‑connected urban enclave.",
+  "image_path": "",
+  "source": "manual"
+},
+"Reinickendorf—Waidmannslust": {
+  "bezirk": "Reinickendorf",
+  "ortsteil": "Waidmannslust",
+  "blurb": "Waidmannslust offers calm streets, lakeside paths, and S‑Bahn convenience. Local cafés and tidy squares give it a cozy neighborhood feel.",
+  "image_path": "",
+  "source": "manual"
+},
+"Reinickendorf—Lübars": {
+  "bezirk": "Reinickendorf",
+  "ortsteil": "Lübars",
+  "blurb": "Lübars is one of Berlin’s oldest villages, with a historic green, farms, and horse pastures. Cycling routes lead straight into the surrounding meadows.",
+  "image_path": "",
+  "source": "manual"
+},
+
+"Spandau—Staaken": {
+  "bezirk": "Spandau",
+  "ortsteil": "Staaken",
+  "blurb": "Staaken spans garden settlements and large estates on Berlin’s western edge. It has a strong community spirit, playgrounds, and quick escapes into Brandenburg.",
+  "image_path": "",
+  "source": "manual"
+},
+"Spandau—Hakenfelde": {
+  "bezirk": "Spandau",
+  "ortsteil": "Hakenfelde",
+  "blurb": "Hakenfelde stretches along the Havel with forests, riverside paths, and quiet residential pockets. Ferries and trails make it a paradise for walkers and cyclists.",
+  "image_path": "",
+  "source": "manual"
+},
+
+"Treptow‑Köpenick—Plänterwald": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Plänterwald",
+  "blurb": "Plänterwald is defined by dense woodland and riverside paths. The Spreepark grounds and forested trails offer a serene, slightly mysterious green world.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Baumschulenweg": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Baumschulenweg",
+  "blurb": "Baumschulenweg takes its name from historic tree nurseries. Canal bridges, garden colonies, and pocket parks make everyday life pleasantly leafy.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Johannisthal": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Johannisthal",
+  "blurb": "Johannisthal has aviation history, quiet residential grids, and green corridors. It borders the science hub of Adlershof while keeping a neighborhood feel.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Niederschöneweide": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Niederschöneweide",
+  "blurb": "Niederschöneweide blends industrial heritage with riverside promenades. Loft conversions, cafés, and bridges over the Spree create a relaxed waterside rhythm.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Adlershof": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Adlershof",
+  "blurb": "Adlershof is Berlin’s science city: media studios, labs, and modern campuses beside older garden settlements. Buzzing workdays meet quiet residential evenings.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Altglienicke": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Altglienicke",
+  "blurb": "Altglienicke has a village heart, new housing areas, and big‑sky views toward the airport plains. Playgrounds and sports fields dot its residential quarters.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Bohnsdorf": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Bohnsdorf",
+  "blurb": "Bohnsdorf is a quiet southern pocket of single‑family homes, garden plots, and tree‑lined streets—ideal for plane‑spotters and nature strolls alike.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Friedrichshagen": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Friedrichshagen",
+  "blurb": "Friedrichshagen charms with Bölschestraße’s cafés, historic villas, and the shores of Müggelsee. It’s a lakeside cultural hub with year‑round festivals and swims.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Rahnsdorf": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Rahnsdorf",
+  "blurb": "Rahnsdorf is a waterside village of wooden houses, ferry piers, and pine forests. Canoes, beaches, and birdlife set a holiday pace on the Müggelspree.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Müggelheim": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Müggelheim",
+  "blurb": "Müggelheim offers forest clearings, lakes, and weekend cottages. Life revolves around barbecues, boat trips, and long walks under tall pines.",
+  "image_path": "",
+  "source": "manual"
+},
+"Treptow‑Köpenick—Schmöckwitz": {
+  "bezirk": "Treptow‑Köpenick",
+  "ortsteil": "Schmöckwitz",
+  "blurb": "Schmöckwitz is Berlin’s southeastern tip: peninsulas, marinas, and quiet lanes between wide waters. A true escape for sailors and paddleboarders.",
+  "image_path": "",
+  "source": "manual"
+}
+}

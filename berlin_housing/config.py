@@ -43,3 +43,16 @@ POI_COUNTS_CSV = os.path.join(PROCESSED_DIR, "poi_counts_per_ortsteil.csv")
 BEZIRK_MASTER_OUT   = os.path.join(PROCESSED_DIR, "bezirk_master.csv")
 ORTSTEIL_MASTER_OUT = os.path.join(PROCESSED_DIR, "ortsteil_master.csv")
 FINAL_MASTER_OUT    = os.path.join(PROCESSED_DIR, "final_master.csv")
+
+# Default values for affordability calculations
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "data" / "processed"
+MASTER_CSV = DATA_PATH / "final_master_with_k4_clusters.csv"
+
+DEFAULT_SIZE_M2 = 60
+DEFAULT_THRESHOLD = 0.30
+DEFAULT_CLUSTER_COL = "k4_cluster"
+DEFAULT_MIETSPIEGEL_COL = "subdistrict_avg_mietspiegel_classification"
+DEFAULT_INCOME_COL = "subdistrict_avg_median_income_eur"
