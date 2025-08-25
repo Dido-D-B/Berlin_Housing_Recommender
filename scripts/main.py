@@ -1,6 +1,6 @@
+from pathlib import Path
 import typer
 import geopandas as gpd
-from pathlib import Path
 from berlin_housing.io import load_table, save_table
 from berlin_housing.cleaning import clean_ortsteil_tables
 from berlin_housing.poi import merge_poi_to_master
@@ -51,6 +51,7 @@ def clean_ortsteil(
     out = clean_ortsteil_tables(df)
     save_table(out, output_path)
     typer.echo(f"✅ Wrote cleaned Ortsteil table to {output_path}")
+
 
 @app.command()
 def build_dataset(
