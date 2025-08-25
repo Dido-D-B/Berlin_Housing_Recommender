@@ -1,5 +1,3 @@
-# berlin_housing/poi/__init__.py
-
 from .poi import (
     default_tags,
     fetch_pois_for_polygon,

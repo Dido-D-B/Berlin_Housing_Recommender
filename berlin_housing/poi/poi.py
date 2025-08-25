@@ -1,15 +1,14 @@
-from __future__ import annotations
 import time
-from pathlib import Path
-from typing import Dict, List
-
 import geopandas as gpd
 import pandas as pd
+from pathlib import Path
+from typing import Dict, List
+from __future__ import annotations
 from osmnx.features import features_from_polygon
 from shapely.geometry import Polygon
 import logging
 
-# Optional progress bar
+# Progress bar 
 try:
     from tqdm import tqdm  # type: ignore
     _HAS_TQDM = True
@@ -19,9 +18,8 @@ except Exception:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 FAILED_PATH = Path("artifacts/failed_ortsteile.txt")
 
-# -----------------------------
 # 1) Config helpers
-# -----------------------------
+# Provide default OSM tags for fetching POIs
 def default_tags() -> Dict[str, List[str]]:
     return {
         "shop": ["supermarket"],
@@ -43,9 +41,8 @@ GROUPED_COLUMNS = {
     "medical": ["clinic", "hospital", "pharmacy"],
 }
 
-# -----------------------------
 # 2) Fetch
-# -----------------------------
+# Fetch POIs for a single polygon with retry and backoff
 def fetch_pois_for_polygon(
     polygon: Polygon,
     tags: Dict[str, List[str]] | None = None,
@@ -98,6 +95,7 @@ def fetch_pois_for_polygon(
         raise last_exc
     return gpd.GeoDataFrame()
 
+# Fetch POIs for all Ortsteile in a GeoDataFrame
 def fetch_all_pois_by_ortsteil(
     boundaries: gpd.GeoDataFrame,
     ortsteil_col: str = "OTEIL",
@@ -155,9 +153,8 @@ def fetch_all_pois_by_ortsteil(
     LOGGER.info("Collected %d POI feature rows across %d Ortsteile", len(gdf_all), len(collected))
     return gdf_all
 
-# -----------------------------
 # 3) Normalize
-# -----------------------------
+# Add flattened tag columns (main_tag, tag_value) to GeoDataFrame
 def add_tag_columns(gdf: gpd.GeoDataFrame, tags: Dict[str, List[str]] | None = None) -> gpd.GeoDataFrame:
     """Flatten OSM keys into main_tag and tag_value (your notebook logic)."""
     tags = tags or default_tags()
@@ -181,9 +178,7 @@ def add_tag_columns(gdf: gpd.GeoDataFrame, tags: Dict[str, List[str]] | None = N
 
     return g
 
-# -----------------------------
-# 4) Aggregate counts per Ortsteil
-# -----------------------------
+# Count POIs per Ortsteil and pivot into wide format
 def count_pois_per_ortsteil(gdf: gpd.GeoDataFrame) -> pd.DataFrame:
     """Pivot counts: rows=ortsteil, columns=tag_value, values=count."""
     if gdf.empty:
@@ -198,6 +193,7 @@ def count_pois_per_ortsteil(gdf: gpd.GeoDataFrame) -> pd.DataFrame:
     piv.columns.name = None
     return piv
 
+# Group related POI columns into aggregated categories
 def group_poi_columns(df_counts: pd.DataFrame, groups: Dict[str, List[str]] = GROUPED_COLUMNS) -> pd.DataFrame:
     """Optional: create grouped columns and drop sources when present."""
     df = df_counts.copy()
@@ -208,9 +204,8 @@ def group_poi_columns(df_counts: pd.DataFrame, groups: Dict[str, List[str]] = GR
             df.drop(columns=exist, inplace=True, errors="ignore")
     return df
 
-# -----------------------------
 # 5) Merge with master table
-# -----------------------------
+# Normalize Ortsteil names (lowercase, replace umlauts/ß)
 def normalize_ortsteil_name(name: str | float) -> str:
     if pd.isna(name):
         return ""
@@ -219,6 +214,7 @@ def normalize_ortsteil_name(name: str | float) -> str:
         s.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss")
     )
 
+# Merge POI counts with the master dataframe by Ortsteil
 def merge_poi_to_master(df_master: pd.DataFrame, df_counts: pd.DataFrame) -> pd.DataFrame:
     m = df_master.copy()
     p = df_counts.copy()
