@@ -1,12 +1,7 @@
-# berlin_housing/cleaning/clean_census.py
+import pandas as pd
 from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import List
-
-import pandas as pd
-
-# Expect these helpers to live in cleaning/clean_shared.py
 from .clean_shared import (
     standardize_columns,
     rename_columns,
@@ -15,10 +10,7 @@ from .clean_shared import (
     normalize_name,
 )
 
-# ---------------------------------------------------------------------
 # Census: Generic cleaner configurable for district or ortsteil levels
-# ---------------------------------------------------------------------
-
 @dataclass
 class CensusCleanConfig:
     """
@@ -42,7 +34,6 @@ class CensusCleanConfig:
             self.integer_cols = []
         if self.float_cols is None:
             self.float_cols = []
-
 
 def clean_census_2022(df: pd.DataFrame, cfg: CensusCleanConfig) -> pd.DataFrame:
     """
@@ -85,7 +76,6 @@ def clean_census_2022(df: pd.DataFrame, cfg: CensusCleanConfig) -> pd.DataFrame:
         df1 = drop_duplicates_key(df1, key_cols)
 
     return df1
-
 
 __all__ = [
     "CensusCleanConfig",

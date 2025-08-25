@@ -1,14 +1,9 @@
-# berlin_housing/cleaning/clean_shared.py
-from __future__ import annotations
-
-from typing import Iterable, Mapping
+# Imports
 import pandas as pd
+from __future__ import annotations
+from typing import Iterable, Mapping
 
-
-# ---------------------------------------------------------------------
-# String + column normalization
-# ---------------------------------------------------------------------
-
+# Convert a string into simple snake_case form
 def _to_snake(name: str) -> str:
     """Simple snake_case normalizer used for headers."""
     return (
@@ -19,14 +14,14 @@ def _to_snake(name: str) -> str:
         .lower()
     )
 
-
+# Standardize dataframe column names to snake_case
 def standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Return a copy with snake_case, trimmed column names."""
     out = df.copy()
     out.columns = [_to_snake(c) for c in out.columns]
     return out
 
-
+# Rename columns using case-insensitive snake_case mapping
 def rename_columns(df: pd.DataFrame, mapping: Mapping[str, str]) -> pd.DataFrame:
     """
     Rename columns using a case-insensitive mapping (keys matched after snake_case).
@@ -37,7 +32,7 @@ def rename_columns(df: pd.DataFrame, mapping: Mapping[str, str]) -> pd.DataFrame
     norm_map = {_to_snake(k): v for k, v in mapping.items()}
     return df2.rename(columns=norm_map)
 
-
+# Normalize German names (umlauts/ß) for safe joins
 def normalize_name(s: str | float | None) -> str:
     """
     Normalize German names to ASCII-ish for safe joins (ae/oe/ue/ss), lowercased/trimmed.
@@ -52,11 +47,7 @@ def normalize_name(s: str | float | None) -> str:
         .replace("ß", "ss")
     )
 
-
-# ---------------------------------------------------------------------
-# Dtypes, duplicates, and join helpers
-# ---------------------------------------------------------------------
-
+# Coerce columns to Int64, float, or string types with cleaning
 def coerce_dtypes(
     df: pd.DataFrame,
     *,
@@ -77,19 +68,19 @@ def coerce_dtypes(
         out[c] = out[c].astype("string").str.strip()
     return out
 
-
+# Drop duplicate rows based on key columns
 def drop_duplicates_key(df: pd.DataFrame, keys: Iterable[str]) -> pd.DataFrame:
     """Drop duplicate rows by key columns, keeping the first occurrence."""
     return df.drop_duplicates(subset=list(keys), keep="first").reset_index(drop=True)
 
-
+# Ensure key columns are unique, raise error if not
 def assert_unique(df: pd.DataFrame, keys: Iterable[str]) -> None:
     """Raise if (keys) are not unique."""
     dup = df.duplicated(subset=list(keys)).sum()
     if dup:
         raise ValueError(f"Expected unique keys {list(keys)} but found {dup} duplicates")
 
-
+# Normalize Bezirk/Ortsteil names for merging
 def normalize_merge_keys(df: pd.DataFrame, bezirk_col: str = "bezirk", ortsteil_col: str = "ortsteil") -> pd.DataFrame:
     """
     Lowercase/strip and replace German umlauts for join keys.
@@ -113,11 +104,7 @@ def normalize_merge_keys(df: pd.DataFrame, bezirk_col: str = "bezirk", ortsteil_
         out[ortsteil_col] = _norm(out[ortsteil_col])
     return out
 
-
-# ---------------------------------------------------------------------
-# Bezirk-specific normalization
-# ---------------------------------------------------------------------
-
+# Normalize Bezirk string values to consistent form
 def clean_bezirk_value(bezirk: str) -> str:
     """
     Normalize Bezirk strings to a consistent, join-friendly form.
@@ -138,18 +125,14 @@ def clean_bezirk_value(bezirk: str) -> str:
     }
     return mapping.get(s, s) or s
 
-
+# Apply clean_bezirk_value across a dataframe column
 def apply_clean_bezirk(df: pd.DataFrame, col: str = "bezirk") -> pd.DataFrame:
     """Apply clean_bezirk_value to a column and return a copy."""
     out = df.copy()
     out[col] = out[col].map(clean_bezirk_value)
     return out
 
-
-# ---------------------------------------------------------------------
 # Public API
-# ---------------------------------------------------------------------
-
 __all__ = [
     # column/name normalization
     "_to_snake",

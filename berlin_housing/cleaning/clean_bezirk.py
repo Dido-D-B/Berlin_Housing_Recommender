@@ -10,7 +10,7 @@ from .clean_shared import (
     apply_clean_bezirk,
 )
 
- # Utility: ensure uniqueness by Bezirk
+# Utility: ensure uniqueness by Bezirk
 def _ensure_unique_by_bezirk(df: pd.DataFrame, name: str) -> pd.DataFrame:
     """
     Guarantee one row per 'bezirk'.
@@ -56,7 +56,6 @@ def clean_bezirk_tables(df: pd.DataFrame) -> pd.DataFrame:
     df1 = drop_duplicates_key(df1, ["bezirk_norm"]) if "bezirk_norm" in df1.columns else df1
     return df1
 
-
 # District enrichment table cleaners (bridges, cinemas, libraries, cars, toilets, tourism, trees, census slice)
 def clean_bridges_df(df_bridges: pd.DataFrame) -> pd.DataFrame:
     df = df_bridges.copy()
@@ -69,7 +68,7 @@ def clean_bridges_df(df_bridges: pd.DataFrame) -> pd.DataFrame:
     df = apply_clean_bezirk(df, "bezirk")
     return df
 
- # Clean cinemas dataset
+# Clean cinemas dataset
 def clean_cinemas_df(df_cinemas: pd.DataFrame) -> pd.DataFrame:
     df = df_cinemas.copy()
     df = df.dropna(subset=["Bezirk"]).rename(columns={
@@ -80,7 +79,7 @@ def clean_cinemas_df(df_cinemas: pd.DataFrame) -> pd.DataFrame:
     df["district_movie_theaters"] = pd.to_numeric(df["district_movie_theaters"], errors="coerce").astype("Int64")
     return df
 
- # Clean libraries dataset
+# Clean libraries dataset
 def clean_libraries_df(df_libraries: pd.DataFrame) -> pd.DataFrame:
     df = df_libraries.copy()
     df = df.rename(columns={
@@ -98,7 +97,7 @@ def clean_libraries_df(df_libraries: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
- # Clean cars dataset
+# Clean cars dataset
 def clean_cars_df(df_cars: pd.DataFrame) -> pd.DataFrame:
     df = df_cars.copy().rename(columns={
         "Bezirk": "bezirk",
@@ -114,7 +113,7 @@ def clean_cars_df(df_cars: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
- # Aggregate toilets dataset
+# Aggregate toilets dataset
 def aggregate_toilets_df(df_toilets: pd.DataFrame) -> pd.DataFrame:
     df = (
         df_toilets.groupby("Bezirk").agg(district_public_toilets=("ID", "count")).reset_index()
@@ -123,7 +122,7 @@ def aggregate_toilets_df(df_toilets: pd.DataFrame) -> pd.DataFrame:
     df = apply_clean_bezirk(df, "bezirk")
     return df
 
- # Clean overnight stays dataset
+# Clean overnight stays dataset
 def clean_overnight_stays_df(df_overnight_stays: pd.DataFrame) -> pd.DataFrame:
     df = df_overnight_stays.copy().rename(columns={
         "Bezirke": "bezirk",
@@ -139,7 +138,7 @@ def clean_overnight_stays_df(df_overnight_stays: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
- # Clean guests dataset
+# Clean guests dataset
 def clean_guests_df(df_guests: pd.DataFrame) -> pd.DataFrame:
     df = df_guests.copy()
 
@@ -170,7 +169,7 @@ def clean_guests_df(df_guests: pd.DataFrame) -> pd.DataFrame:
     df = _ensure_unique_by_bezirk(df, "guests")
     return df
 
- # Clean trees dataset
+# Clean trees dataset
 def clean_trees_df(df_trees: pd.DataFrame) -> pd.DataFrame:
     df = df_trees.copy().rename(columns={
         "Bezirk": "bezirk",
@@ -257,7 +256,6 @@ def clean_census_district_df(df_census: pd.DataFrame) -> pd.DataFrame:
         "women_population_percentage": "district_female_population_percentage",
     })
 
-
     drop_cols = [
         "floor_heating", "block_heating", "stove_heating", "no_heating", "gas_energy",
         "oil_energy", "mixed_energy_sources", "solar_energy", "wood_pellets_energy",
@@ -336,7 +334,6 @@ def build_bezirk_enrichment(
     master = _ensure_unique_by_bezirk(master, "master")
     return master
 
-
 # Notebook-style Bezirk master (alternate builder)
 def build_bezirk_master_notebook_style(
     buildings: pd.DataFrame,
@@ -378,7 +375,6 @@ def build_bezirk_master_notebook_style(
                 pass
 
     return master
-
 
 # Public API of this module
 __all__ = [

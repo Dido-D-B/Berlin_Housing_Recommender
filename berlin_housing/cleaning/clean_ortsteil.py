@@ -1,27 +1,17 @@
-# berlin_housing/cleaning/clean_ortsteil.py
-from __future__ import annotations
-
-from typing import List
 import pandas as pd
-
-# Shared helpers (you'll place these in cleaning/clean_shared.py)
+from __future__ import annotations
+from typing import List
+from .clean_census import CensusCleanConfig, clean_census_2022
 from .clean_shared import (
     standardize_columns,
     coerce_dtypes,
     drop_duplicates_key,
     normalize_name,
     clean_bezirk_value,
-    normalize_merge_keys,   # keep this in shared to reuse across modules
+    normalize_merge_keys,   
 )
 
-# Census utilities
-from .clean_census import CensusCleanConfig, clean_census_2022
-
-
-# ---------------------------------------------------------------------
 # Core Ortsteil table cleaner
-# ---------------------------------------------------------------------
-
 def clean_ortsteil_tables(df: pd.DataFrame) -> pd.DataFrame:
     """
     Clean Ortsteil-level table.
@@ -61,11 +51,7 @@ def clean_ortsteil_tables(df: pd.DataFrame) -> pd.DataFrame:
 
     return df1
 
-
-# ---------------------------------------------------------------------
 # Census → Ortsteil builder (wraps the generic census cleaner)
-# ---------------------------------------------------------------------
-
 def build_census_ortsteil_table(
     census_raw: pd.DataFrame,
     *,
@@ -88,10 +74,6 @@ def build_census_ortsteil_table(
     )
     census = clean_census_2022(census_raw, cfg)
 
-    # Example: to keep a subset:
-    # keep = ["ortsteil_id","ortsteil","bezirk","population_total","median_age", ...]
-    # census = census[keep]
-
     # Strong uniqueness guard
     key_cols = [c for c in ["ortsteil_id", "ortsteil_norm"] if c in census.columns]
     if key_cols:
@@ -99,17 +81,13 @@ def build_census_ortsteil_table(
 
     return census
 
-
-# ---------------------------------------------------------------------
 # Ortsteil population pivot (age & gender) + totals/shares
-# ---------------------------------------------------------------------
-
 def pivot_subdistrict_population(df_ort_population: pd.DataFrame) -> pd.DataFrame:
     """
     Pivot age & gender distributions to wide form and compute totals + shares per Ortsteil.
     Expected columns in input: ['Bezirk','Ortsteil','Age group','Gender','Frequency']
     """
-    # --- Age pivot ---
+    # Age pivot
     age = (
         df_ort_population
         .pivot_table(index=["Bezirk", "Ortsteil"], columns="Age group", values="Frequency", aggfunc="sum")
@@ -140,7 +118,7 @@ def pivot_subdistrict_population(df_ort_population: pd.DataFrame) -> pd.DataFram
         })
     )
 
-    # --- Gender pivot ---
+    # Gender pivot
     gender = (
         df_ort_population
         .pivot_table(index=["Bezirk", "Ortsteil"], columns="Gender", values="Frequency", aggfunc="sum")
@@ -153,7 +131,7 @@ def pivot_subdistrict_population(df_ort_population: pd.DataFrame) -> pd.DataFram
         })
     )
 
-    # --- name cleaning to lower-case (as in notebook) ---
+    # Name cleaning to lower-case
     def _clean_bezirk_simple(x: str) -> str:
         return clean_bezirk_value(x)
 
@@ -165,10 +143,10 @@ def pivot_subdistrict_population(df_ort_population: pd.DataFrame) -> pd.DataFram
     age["ortsteil"] = age["ortsteil"].map(_clean_ortsteil_simple)
     gender["ortsteil"] = gender["ortsteil"].map(_clean_ortsteil_simple)
 
-    # --- Merge age + gender ---
+    # Merge age + gender
     pop = age.merge(gender, on=["bezirk", "ortsteil"], how="outer")
 
-    # --- Totals and shares ---
+    # Totals and shares
     pop["total_population"] = pop["subdistrict_male_population"].fillna(0) + pop["subdistrict_female_population"].fillna(0)
 
     seniors_cols = [
@@ -201,10 +179,7 @@ def pivot_subdistrict_population(df_ort_population: pd.DataFrame) -> pd.DataFram
     return pop
 
 
-# ---------------------------------------------------------------------
 # Street directory lookup (for Mietspiegel joins)
-# ---------------------------------------------------------------------
-
 def build_street_lookup(df_streets: pd.DataFrame) -> pd.DataFrame:
     """
     Clean the street directory to a lookup for Mietspiegel joins.
@@ -222,11 +197,7 @@ def build_street_lookup(df_streets: pd.DataFrame) -> pd.DataFrame:
     )
     return lookup
 
-
-# ---------------------------------------------------------------------
 # Ortsteil rent + income aggregation (Mietspiegel × PLR)
-# ---------------------------------------------------------------------
-
 def build_ortsteil_rent_income(
     df_miet: pd.DataFrame,
     df_income: pd.DataFrame,
@@ -288,11 +259,7 @@ def build_ortsteil_rent_income(
 
     return agg
 
-
-# ---------------------------------------------------------------------
 # Final Ortsteil master (population × rent/income)
-# ---------------------------------------------------------------------
-
 def build_ortsteil_master_table(df_population: pd.DataFrame, df_rent_income: pd.DataFrame) -> pd.DataFrame:
     """
     Final merge (population × rent/income) per Ortsteil, replicating the last notebook step.
@@ -301,7 +268,6 @@ def build_ortsteil_master_table(df_population: pd.DataFrame, df_rent_income: pd.
     ri = normalize_merge_keys(df_rent_income.copy(), "bezirk", "ortsteil")
     master = pop.merge(ri, on=["bezirk", "ortsteil"], how="inner")
     return master
-
 
 def build_ortsteil_master(ortsteil_raw: pd.DataFrame) -> pd.DataFrame:
     """
@@ -312,7 +278,6 @@ def build_ortsteil_master(ortsteil_raw: pd.DataFrame) -> pd.DataFrame:
     if "ortsteil_norm" in ort.columns:
         _ = drop_duplicates_key(ort, ["ortsteil_norm"])
     return ort
-
 
 __all__ = [
     "clean_ortsteil_tables",
