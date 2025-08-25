@@ -1,5 +1,3 @@
-
-
 """
 Clustering module for Berlin Housing project.
 
@@ -10,21 +8,16 @@ writes an updated CSV.
 You can import and call `run()` from other modules, or execute this file
 as a script.
 """
+import pandas as pd
+import numpy as np
 from __future__ import annotations
-
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Tuple
-
-import pandas as pd
-import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
-# ---------------------------------------------------------------------
 # Configuration dataclass
-# ---------------------------------------------------------------------
-
 @dataclass
 class ClusteringConfig:
     master_csv: Path = Path("data/processed/final_master.csv")
@@ -35,18 +28,14 @@ class ClusteringConfig:
     n_clusters: int = 4
     random_state: int = 42
 
-
-# ---------------------------------------------------------------------
-# Core functions
-# ---------------------------------------------------------------------
-
+# Load master and PCA dataframes from disk
 def _load_data(cfg: ClusteringConfig) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Load master and PCA dataframes from disk."""
     master = pd.read_csv(cfg.master_csv)
     pca = pd.read_csv(cfg.pca_csv)
     return master, pca
 
-
+# Select principal component columns and return matrix + names
 def _select_pc_matrix(pca_df: pd.DataFrame, pc_prefix: str) -> Tuple[np.ndarray, List[str]]:
     """Return X matrix of principal components and the list of PC columns."""
     pc_cols = [c for c in pca_df.columns if c.startswith(pc_prefix)]
@@ -55,14 +44,14 @@ def _select_pc_matrix(pca_df: pd.DataFrame, pc_prefix: str) -> Tuple[np.ndarray,
     X = pca_df[pc_cols].values
     return X, pc_cols
 
-
+# Fit a KMeans model on the PCA matrix
 def _fit_kmeans(X: np.ndarray, n_clusters: int, random_state: int) -> KMeans:
     """Fit KMeans and return the model."""
     model = KMeans(n_clusters=n_clusters, random_state=random_state)
     model.fit(X)
     return model
 
-
+# Evaluate clustering quality with silhouette, Calinski-Harabasz, Davies-Bouldin
 def _evaluate_clusters(X: np.ndarray, labels: np.ndarray) -> dict:
     """Compute common clustering quality metrics for quick logging."""
     # Guard against degenerate labels
@@ -74,7 +63,7 @@ def _evaluate_clusters(X: np.ndarray, labels: np.ndarray) -> dict:
         "davies_bouldin": float(davies_bouldin_score(X, labels)),
     }
 
-
+# Full clustering pipeline: load data, fit KMeans, evaluate, merge labels, save output
 def run(cfg: ClusteringConfig = ClusteringConfig()) -> pd.DataFrame:
     """
     Execute the KMeans (k=4 by default) pipeline and write the updated
@@ -123,10 +112,7 @@ def run(cfg: ClusteringConfig = ClusteringConfig()) -> pd.DataFrame:
 
     return merged
 
-
-# ---------------------------------------------------------------------
 # CLI
-# ---------------------------------------------------------------------
 if __name__ == "__main__":
     # Allow running this file directly: `python -m berlin_housing.tasks.clustering.model`
     _ = run()

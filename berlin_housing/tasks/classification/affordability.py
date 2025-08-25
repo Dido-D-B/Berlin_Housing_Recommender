@@ -14,6 +14,7 @@ ANCHORS_CLASS_TO_EUR: Dict[float, float] = {
     2.9: 19.0,
 }
 
+# Interpolate Mietspiegel class values to €/m² using anchor mapping
 def class_to_eur_interpolated(
     values: Sequence[float],
     anchors: Dict[float, float] = ANCHORS_CLASS_TO_EUR
@@ -30,6 +31,8 @@ def class_to_eur_interpolated(
     v = np.clip(v, xs_arr.min(), xs_arr.max())
     return np.interp(v, xs_arr, ys_arr)
 
+
+# Add affordability metrics (rent/m², estimated rent, rent-to-income, label)
 def add_affordability(
     df: pd.DataFrame,
     *,

@@ -1,24 +1,21 @@
 """Train KMeans on PCA features, write clustered master CSV, and save the model."""
-from __future__ import annotations
-
-from pathlib import Path
 import joblib
-
+from __future__ import annotations
+from pathlib import Path
+from .configs import DEFAULT_CFG
 from .model import (
     ClusteringConfig,
     _load_data,
     _select_pc_matrix,
     _fit_kmeans,
 )
-from .configs import DEFAULT_CFG
-
-
+ # Save trained model to disk with joblib
 def save_model(model, path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, path)
     return path
 
-
+ # Run clustering training pipeline and optionally save KMeans model
 def run_training(
     cfg: ClusteringConfig = DEFAULT_CFG,
     model_out: Path | None = Path("models/kmeans_k4.joblib"),
@@ -34,6 +31,6 @@ def run_training(
         return saved
     return Path()
 
-
+# CLI
 if __name__ == "__main__":
     run_training()

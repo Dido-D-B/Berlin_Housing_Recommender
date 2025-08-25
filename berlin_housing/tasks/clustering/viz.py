@@ -1,9 +1,9 @@
-# berlin_housing/viz.py
 from __future__ import annotations
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# Plot a grid of histograms for selected columns
 def hist_grid(df: pd.DataFrame, cols: list[str], title: str = ""):
     df[cols].hist(figsize=(16, 12), bins=20)
     plt.tight_layout()
@@ -11,6 +11,7 @@ def hist_grid(df: pd.DataFrame, cols: list[str], title: str = ""):
         plt.suptitle(title, y=1.02, fontsize=16)
     plt.show()
 
+# Plot full correlation heatmap of numeric columns
 def corr_heatmap(df: pd.DataFrame, title: str = "Correlation Matrix"):
     corr = df.corr(numeric_only=True)
     plt.figure(figsize=(20, 16))
@@ -19,6 +20,7 @@ def corr_heatmap(df: pd.DataFrame, title: str = "Correlation Matrix"):
     plt.show()
     return corr
 
+# Plot heatmap of strong correlations above a threshold
 def strong_corr_heatmap(df: pd.DataFrame, threshold: float = 0.5, title: str = "Strong Correlations"):
     corr = df.corr(numeric_only=True)
     strong = corr.mask(corr.abs() < threshold)
@@ -28,6 +30,7 @@ def strong_corr_heatmap(df: pd.DataFrame, threshold: float = 0.5, title: str = "
     plt.show()
     return strong
 
+# Plot normalized cluster feature profiles as grouped bar chart
 def plot_scaled_profiles(
     scaled_profiles: pd.DataFrame,
     title: str = "Normalized Cluster Feature Profiles",

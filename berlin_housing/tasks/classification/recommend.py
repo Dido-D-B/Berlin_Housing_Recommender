@@ -2,6 +2,7 @@ from __future__ import annotations
 import pandas as pd
 from typing import Iterable, Optional, Dict, Any
 
+# Compute ranking score from rent-to-income ratio with small amenity adjustments
 def _score_row(row: pd.Series) -> float:
     ratio = float(row.get("aff_rent_to_income", 1.0))
     bonus = 0.0
@@ -10,6 +11,7 @@ def _score_row(row: pd.Series) -> float:
             bonus -= 0.0005 * float(row[col])
     return ratio + bonus
 
+# Select a compact set of columns for the results table
 def _compact_columns(df: pd.DataFrame, cluster_col: str) -> list[str]:
     base_cols = [c for c in [
         "bezirk", "ortsteil", cluster_col,
@@ -20,6 +22,7 @@ def _compact_columns(df: pd.DataFrame, cluster_col: str) -> list[str]:
             base_cols.append(c)
     return base_cols
 
+# Filter → rank → return top‑k with graceful fallbacks and relaxed thresholds
 def top_recommendations(
     df_with_aff: pd.DataFrame,
     *,
@@ -65,7 +68,7 @@ def top_recommendations(
         dfi = dfi.sort_values(by=["_score", "aff_rent_to_income"]).head(k)
         return dfi[_compact_columns(dfi, cluster_col) + ["_score", "_note"]]
 
-    # --- Attempt A: exact filters ---
+    # Attempt A: exact filters 
     dfA = df0
     if only_affordable and "aff_label" in dfA:
         dfA = dfA[dfA["aff_label"]]
@@ -74,7 +77,7 @@ def top_recommendations(
     if not out.empty or not fallback_if_empty:
         return out
 
-    # --- Attempt B: relax thresholds within same cluster(s) ---
+    # Attempt B: relax thresholds within same cluster(s) 
     if relax_thresholds and "aff_rent_to_income" in df0.columns:
         df_cluster = _apply_cluster(df0)
         for t in relax_thresholds:
@@ -83,13 +86,13 @@ def top_recommendations(
             if not out.empty:
                 return out
 
-    # --- Attempt C1: same cluster(s), ignore affordability ---
+    # Attempt C1: same cluster(s), ignore affordability 
     df_f1 = _apply_cluster(df0)
     out = _rank_take(df_f1, note="no_affordable_in_cluster")
     if not out.empty:
         return out
 
-    # --- Attempt C2: affordable anywhere (drop cluster filter) ---
+    # Attempt C2: affordable anywhere (drop cluster filter) 
     df_f2 = df0
     if "aff_label" in df_f2:
         df_f2 = df_f2[df_f2["aff_label"]]
@@ -97,5 +100,5 @@ def top_recommendations(
     if not out.empty:
         return out
 
-    # --- Attempt C3: cheapest overall ---
+    # Attempt C3: cheapest overall 
     return _rank_take(df0, note="cheapest_overall")
