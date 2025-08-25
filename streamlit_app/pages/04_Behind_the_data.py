@@ -17,12 +17,10 @@ st.set_page_config(
     page_icon=icon_path,
     layout="wide",
 )
-
+# CSS
 inject_responsive_css()
 
 # UI
-
-# Title & intro
 st.markdown("""
     <div style="border: 2px solid #A50034; background-color: #A50034; color: white; text-align: center; padding: 10px; border-radius: 8px;">
         <h1>Behind the Data</h1>

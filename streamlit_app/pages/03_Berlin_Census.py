@@ -9,6 +9,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+# Page Configurations
 icon_path = os.path.join(PROJECT_ROOT, "streamlit_app", "images", "icon.png")
 st.set_page_config(
     page_title="Berlin Housing - Census",
@@ -16,8 +17,10 @@ st.set_page_config(
     layout="wide",
 )
 
+# CSS
 inject_responsive_css()
 
+# Title
 st.markdown(
     """
     <div style='border: 3px solid #A50034; background-color: #A50034; padding: 15px; text-align: center; border-radius: 6px;'>

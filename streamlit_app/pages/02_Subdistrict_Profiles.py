@@ -16,6 +16,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+# Page Configurations
 icon_path = os.path.join(PROJECT_ROOT, "streamlit_app", "images", "icon.png")
 st.set_page_config(
     page_title="Berlin Housing - Profiles",
@@ -23,6 +24,7 @@ st.set_page_config(
     layout="wide",
 )
 
+# CSS
 inject_responsive_css()
 
 # UI
@@ -102,9 +104,7 @@ for i, lbl in enumerate(labels_to_show):
         st.write(CLUSTER_NOTES.get(cid, ""))
 
 
-# Map (always use GeoJSON)
-
-# Allow manual selection if auto-detect failed
+# Map (allow manual selection if auto-detect failed)
 if not GEO_PATH or not os.path.isfile(GEO_PATH):
     st.warning("GeoJSON not found at the usual locations.")
     default_guess = os.path.join(PROJECT_ROOT, "data", "processed", "berlin_ortsteil_boundaries.geojson")

@@ -18,6 +18,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+# Page Configurations
 icon_path = os.path.join(PROJECT_ROOT, "streamlit_app", "images", "icon.png")
 st.set_page_config(
     page_title="Berlin Housing - Recommender",
@@ -26,6 +27,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# CSS
 inject_responsive_css()
 
 # Household size assumptions (for quick affordability by household type) 
@@ -37,6 +39,7 @@ HOUSEHOLD_M2 = {
     "Senior": 40,
 }
 
+# Estimate required apartment size
 def estimate_required_sqm(hh_type: str, *, children: int = 0, wg_people: int = 3) -> int:
     if hh_type == "Single":
         return HOUSEHOLD_M2["Single"]
@@ -51,7 +54,6 @@ def estimate_required_sqm(hh_type: str, *, children: int = 0, wg_people: int = 3
     return HOUSEHOLD_M2["Single"]
 
 # Household-type POI weighting for ranking (applied if columns exist in results)
-
 HH_WEIGHTS = {
     "Family": {"green_spaces": 1.0, "playgrounds": 1.0, "schools": 0.8, "nightclub": -0.5},
     "WG": {"cafes": 0.7, "bar": 0.7, "restaurant": 0.4, "transit_stops": 0.8},
@@ -156,7 +158,7 @@ with st.sidebar:
         help="Lifestyle profile"
     )
 
-    # --- Household type controls ---
+    # Household type controls
     hh_type = st.selectbox(
         "Household type",
         ["Single", "Couple", "Family", "WG", "Senior"],
@@ -184,7 +186,7 @@ with st.sidebar:
     prefer_quiet = None  # will be set in Advanced Settings
 
     with st.expander("Advanced Settings"):
-        # 1) --- Amenity preferences (optional) ---
+        # Amenity preferences
         amenity_labels = list(AMENITY_COLUMNS.keys())
         selected_amenities = st.multiselect(
             "Prioritize amenities (optional)",
@@ -198,23 +200,23 @@ with st.sidebar:
             help="How strongly to prioritize the selected amenities in ranking."
         )
 
-        # 2) --- Quieter areas preference ---
+        # Quieter areas preference
         prefer_quiet = st.checkbox(
             "Prefer quieter areas",
             value=False,
             help="Lightly downweights nightlife (bars, nightclubs) where data is available."
         )
 
-        # 3) --- Affordability threshold ---
+        # Affordability threshold
         thr = st.slider(
             "Affordability threshold (rent/income)",
             0.20, 0.50, 0.30, 0.01, format="%.2f"
         )
 
-        # 4) --- How many results ---
+        # How many results
         k = st.slider("How many results?", 3, 10, 5)
 
-        # 5) --- Relaxed threshold fallback ---
+        # Relaxed threshold fallback
         relaxed = st.checkbox(
             "Allow relaxed threshold fallback",
             value=True,
@@ -222,7 +224,7 @@ with st.sidebar:
         )
         relax_seq = (0.32, 0.35, 0.40) if relaxed else ()
 
-        # 6) --- Household-based size (recommended) ---
+        # Household-based size
         use_hh_size = st.checkbox(
             "Use household-based size (recommended)",
             value=True,
