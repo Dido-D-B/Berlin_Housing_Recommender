@@ -1,3 +1,4 @@
+# Imports
 import pandas as pd
 from berlin_housing.io import load_master
 from berlin_housing import add_affordability, top_recommendations
@@ -5,6 +6,7 @@ from berlin_housing.config import (
     DEFAULT_MIETSPIEGEL_COL, DEFAULT_INCOME_COL, DEFAULT_CLUSTER_COL
 )
 
+# Get top k recommended subdistricts
 def get_top_k(
     monthly_income_eur: float,
     size_m2: int,

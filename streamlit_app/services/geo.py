@@ -1,11 +1,13 @@
-from __future__ import annotations
+# Imports
 import json
+from __future__ import annotations
 from pathlib import Path
 from typing import Dict, Iterable, Set, Tuple
 
-# --- simple normalizer (handles umlauts + case) so names match reliably ---
+# Simple normalizer (handles umlauts + case) so names match reliably 
 _UMLAUT = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss",
                           "Ä": "Ae", "Ö": "Oe", "Ü": "Ue"})
+
 def norm(s: str) -> str:
     return (s or "").strip().lower().translate(_UMLAUT)
 
@@ -24,8 +26,7 @@ def feature_name(props: Dict) -> str:
                     return str(v[k])
     return ""
 
-# ---------- public helpers your page imports ----------
-
+# Load geojson
 def load_geojson(path: str | Path) -> Dict:
     """Load a FeatureCollection GeoJSON from disk."""
     path = Path(path)
@@ -35,6 +36,7 @@ def load_geojson(path: str | Path) -> Dict:
         raise ValueError("Expected a FeatureCollection GeoJSON")
     return gj
 
+# Return new feature collection
 def subset_by_names(gj: Dict, allowed_names: Iterable[str]) -> Tuple[Dict, Set[str]]:
     """
     Return a new FeatureCollection containing only features whose name
