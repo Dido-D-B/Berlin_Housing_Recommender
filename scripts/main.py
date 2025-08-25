@@ -4,6 +4,20 @@ import geopandas as gpd
 from berlin_housing.io import load_table, save_table
 from berlin_housing.cleaning import clean_ortsteil_tables
 from berlin_housing.poi import merge_poi_to_master
+import logging
+from berlin_housing.poi import (
+    fetch_all_pois_by_ortsteil,
+    add_tag_columns,
+    count_pois_per_ortsteil,
+    group_poi_columns,
+)
+
+app = typer.Typer(help="CLI for scraping POIs and building Ortsteil master datasets")
+
+def setup_logging(verbosity: int = 1) -> None:
+    """Configure basic console logging based on verbosity level (0=WARNING, 1=INFO, 2+=DEBUG)."""
+    level = logging.WARNING if verbosity <= 0 else (logging.INFO if verbosity == 1 else logging.DEBUG)
+    logging.basicConfig(level=level, format="%(levelname)s: %(message)s")
 
 @app.command()
 def scrape_poi_all(
@@ -70,3 +84,6 @@ def build_dataset(
         master = ortsteil_df.copy()
     save_table(master, output_path)
     typer.echo(f"✅ Built master dataset at {output_path}")
+
+if __name__ == "__main__":
+    app()
