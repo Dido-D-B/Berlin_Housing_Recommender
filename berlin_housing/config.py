@@ -1,11 +1,10 @@
 import os
 
-# repo root = parent of this file's directory
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(REPO_ROOT, "data")
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
 
-# --- Global flags ---
+# Global flags
 # If True, the builder will prefer scraping POIs via poi.py (using boundaries)
 # instead of loading a precomputed CSV. The CSV path below is then used as a cache/output.
 FORCE_SCRAPE_POI = True
@@ -21,7 +20,7 @@ CENSUS_DISTRICT  = os.path.join(DATA_DIR, "berlin_census_2022.csv")
 TOURISM_TOTALS   = os.path.join(DATA_DIR, "berlin_tourism_guests_overnightstays_2023_2024.csv")
 TOURISM_CHANGES  = os.path.join(DATA_DIR, "berlin_tourism_overnightstays_changes_2023_2024.csv")
 
- # Ortsteil-level
+# Ortsteil-level
 ORTS_POP_CSV     = os.path.join(DATA_DIR, "berlin_ortsteil_population.csv")  # or use subdistrict_2020 file
 ORTS_RI_CSV      = os.path.join(DATA_DIR, "berlin_ortsteil_rent_income.csv")
 
@@ -35,8 +34,8 @@ POI_RATE_LIMIT_S = 1.5
 POI_RETRIES = 3
 POI_BACKOFF_S = 2.0
 
-# POI counts cache (written by the scraper; can be reused on subsequent runs)
-# When FORCE_SCRAPE_POI=True, this path is treated as an output location.
+# POI counts cache 
+# When FORCE_SCRAPE_POI=True, this path is treated as an output location
 POI_COUNTS_CSV = os.path.join(PROCESSED_DIR, "poi_counts_per_ortsteil.csv")
 
 # Processed outputs (what we save after building)

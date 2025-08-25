@@ -1,18 +1,20 @@
-# berlin_housing/features.py
 from __future__ import annotations
 import pandas as pd
 import numpy as np
 
 ID_COLS = ["bezirk", "ortsteil"]
 
+# Return list of age-related population columns
 def age_columns(df: pd.DataFrame) -> list[str]:
     return [c for c in df.columns if c.startswith("subdistrict_population_age_")]
 
+# Return list of numeric POI-related columns (excluding IDs and population/area)
 def poi_columns(df: pd.DataFrame) -> list[str]:
     exclude = set(ID_COLS + ["total_population", "subdistrict_area_km2"])
     return [c for c in df.columns
             if c not in exclude and pd.api.types.is_numeric_dtype(df[c])]
 
+# Add sanity check columns: sum of age groups and population difference
 def add_sanity_checks(df: pd.DataFrame) -> pd.DataFrame:
     """Adds age_group_sum and pop_diff sanity columns."""
     ages = age_columns(df)
@@ -21,6 +23,7 @@ def add_sanity_checks(df: pd.DataFrame) -> pd.DataFrame:
     out["pop_diff"] = out["total_population"] - out["age_group_sum"]
     return out
 
+# Engineer derived features: diversity, POI counts, densities, ratios
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Adds:
@@ -76,6 +79,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 
     return out
 
+# Select final feature set for modeling (drop IDs and specified cols)
 def select_model_features(df: pd.DataFrame, drop_cols: list[str] | None = None) -> pd.DataFrame:
     """Drop identifiers and any explicitly provided columns before scaling/PCA."""
     drop = set((drop_cols or []) + ID_COLS + ["classification_category", "subdistrict_avg_mietspiegel_classification"])

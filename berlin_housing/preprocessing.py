@@ -1,4 +1,3 @@
-# berlin_housing/preprocessing.py
 from __future__ import annotations
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -6,6 +5,7 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
+# Create a scaler object (StandardScaler or MinMaxScaler)
 def make_scaler(kind: str = "standard"):
     if kind == "standard":
         return StandardScaler()
@@ -13,20 +13,20 @@ def make_scaler(kind: str = "standard"):
         return MinMaxScaler()
     raise ValueError("kind must be 'standard' or 'minmax'")
 
+# Fit and apply scaler to numeric dataframe, return scaled dataframe and scaler
 def fit_scale(df_num: pd.DataFrame, kind: str = "standard") -> tuple[pd.DataFrame, object]:
     scaler = make_scaler(kind)
     Xs = scaler.fit_transform(df_num)
     return pd.DataFrame(Xs, columns=df_num.columns, index=df_num.index), scaler
 
+# Remove low-variance features using VarianceThreshold
 def apply_variance_threshold(df_num: pd.DataFrame, threshold: float = 0.0) -> tuple[pd.DataFrame, VarianceThreshold]:
     vt = VarianceThreshold(threshold=threshold)
     Xr = vt.fit_transform(df_num)
     cols = df_num.columns[vt.get_support()]
     return pd.DataFrame(Xr, columns=cols, index=df_num.index), vt
 
-
-# --- Unified preprocessing pipeline (imputation + optional scaling) ---
-
+# Build preprocessing pipeline with imputation and optional scaling
 def make_preprocessor(kind: str = "standard", impute_strategy: str = "median") -> Pipeline:
     """Create a preprocessing pipeline with imputation + optional scaling.
 
@@ -51,7 +51,7 @@ def make_preprocessor(kind: str = "standard", impute_strategy: str = "median") -
         steps.append(("scaler", scaler))
     return Pipeline(steps)
 
-
+# Fit preprocessing pipeline and return transformed dataframe
 def fit_transform_preprocessor(preproc: Pipeline, X_df: pd.DataFrame) -> tuple[pd.DataFrame, Pipeline]:
     """Fit the preprocessor and return a DataFrame with same index/columns.
 
