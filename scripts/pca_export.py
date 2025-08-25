@@ -1,9 +1,8 @@
-# script/pca_export.py
-from __future__ import annotations
 import pandas as pd
+import numpy as np
+from __future__ import annotations
 from pathlib import Path
 from berlin_housing.features import add_sanity_checks, engineer_features, select_model_features
-import numpy as np
 from berlin_housing.preprocessing import make_preprocessor, fit_transform_preprocessor
 from berlin_housing.pca import pca_2d_for_viz, pca_until_variance
 
