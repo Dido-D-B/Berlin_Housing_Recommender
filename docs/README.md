@@ -1,7 +1,7 @@
 # Berlin Housing Affordability
 
 ## Project Overview
-The Berlin Housing Affordability project analyzes housing affordability across Berlin subdistricts (Ortsteile) by integrating multiple datasets including the Mietspiegel (rent index) for 2023/2024, Census 2022 data, points of interest (POIs), and income datasets. The goal is to provide a detailed understanding of rental prices, income levels, and housing availability throughout Berlin’s neighborhoods, enabling informed decisions and policy recommendations.
+The Berlin Housing Affordability project analyzes housing affordability across Berlin subdistricts (Ortsteile) by integrating multiple datasets including the Mietspiegel (rent index) for 2024, Census 2022 data, points of interest (POIs), and income datasets. The goal is to provide a detailed understanding of affordability and amenities throughout Berlin’s neighborhoods, enabling informed decisions.
 
 ## Key Features
 - Interactive data visualizations of rental and housing trends in Berlin
