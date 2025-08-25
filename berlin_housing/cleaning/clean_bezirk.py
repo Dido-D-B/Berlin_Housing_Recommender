@@ -1,9 +1,6 @@
-# berlin_housing/cleaning/clean_bezirk.py
-from __future__ import annotations
-
+# Imports
 import pandas as pd
-
-# Expect these helpers to live in cleaning/clean_shared.py
+from __future__ import annotations
 from .clean_shared import (
     standardize_columns,
     coerce_dtypes,
@@ -13,6 +10,7 @@ from .clean_shared import (
     apply_clean_bezirk,
 )
 
+ # Utility: ensure uniqueness by Bezirk
 def _ensure_unique_by_bezirk(df: pd.DataFrame, name: str) -> pd.DataFrame:
     """
     Guarantee one row per 'bezirk'.
@@ -22,7 +20,6 @@ def _ensure_unique_by_bezirk(df: pd.DataFrame, name: str) -> pd.DataFrame:
     if "bezirk" not in df.columns or df.empty:
         return df
 
-    # already unique?
     if not df["bezirk"].duplicated().any():
         return df
 
@@ -33,14 +30,10 @@ def _ensure_unique_by_bezirk(df: pd.DataFrame, name: str) -> pd.DataFrame:
             agg_map[c] = "first"
 
     out = df.groupby("bezirk", as_index=False).agg(agg_map)
-    # final guard
     out = out.drop_duplicates(subset=["bezirk"])
     return out
 
-# -----------------------------
 # Core Bezirk table cleaner
-# -----------------------------
-
 def clean_bezirk_tables(df: pd.DataFrame) -> pd.DataFrame:
     """
     Clean Bezirk-level table.
@@ -64,11 +57,7 @@ def clean_bezirk_tables(df: pd.DataFrame) -> pd.DataFrame:
     return df1
 
 
-# -----------------------------
-# District enrichment table cleaners
-# (bridges, cinemas, libraries, cars, toilets, tourism, trees, census slice)
-# -----------------------------
-
+# District enrichment table cleaners (bridges, cinemas, libraries, cars, toilets, tourism, trees, census slice)
 def clean_bridges_df(df_bridges: pd.DataFrame) -> pd.DataFrame:
     df = df_bridges.copy()
     df = df.rename(columns={
@@ -80,7 +69,7 @@ def clean_bridges_df(df_bridges: pd.DataFrame) -> pd.DataFrame:
     df = apply_clean_bezirk(df, "bezirk")
     return df
 
-
+ # Clean cinemas dataset
 def clean_cinemas_df(df_cinemas: pd.DataFrame) -> pd.DataFrame:
     df = df_cinemas.copy()
     df = df.dropna(subset=["Bezirk"]).rename(columns={
@@ -91,7 +80,7 @@ def clean_cinemas_df(df_cinemas: pd.DataFrame) -> pd.DataFrame:
     df["district_movie_theaters"] = pd.to_numeric(df["district_movie_theaters"], errors="coerce").astype("Int64")
     return df
 
-
+ # Clean libraries dataset
 def clean_libraries_df(df_libraries: pd.DataFrame) -> pd.DataFrame:
     df = df_libraries.copy()
     df = df.rename(columns={
@@ -109,7 +98,7 @@ def clean_libraries_df(df_libraries: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
-
+ # Clean cars dataset
 def clean_cars_df(df_cars: pd.DataFrame) -> pd.DataFrame:
     df = df_cars.copy().rename(columns={
         "Bezirk": "bezirk",
@@ -125,7 +114,7 @@ def clean_cars_df(df_cars: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
-
+ # Aggregate toilets dataset
 def aggregate_toilets_df(df_toilets: pd.DataFrame) -> pd.DataFrame:
     df = (
         df_toilets.groupby("Bezirk").agg(district_public_toilets=("ID", "count")).reset_index()
@@ -134,7 +123,7 @@ def aggregate_toilets_df(df_toilets: pd.DataFrame) -> pd.DataFrame:
     df = apply_clean_bezirk(df, "bezirk")
     return df
 
-
+ # Clean overnight stays dataset
 def clean_overnight_stays_df(df_overnight_stays: pd.DataFrame) -> pd.DataFrame:
     df = df_overnight_stays.copy().rename(columns={
         "Bezirke": "bezirk",
@@ -150,7 +139,7 @@ def clean_overnight_stays_df(df_overnight_stays: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
-
+ # Clean guests dataset
 def clean_guests_df(df_guests: pd.DataFrame) -> pd.DataFrame:
     df = df_guests.copy()
 
@@ -181,7 +170,7 @@ def clean_guests_df(df_guests: pd.DataFrame) -> pd.DataFrame:
     df = _ensure_unique_by_bezirk(df, "guests")
     return df
 
-
+ # Clean trees dataset
 def clean_trees_df(df_trees: pd.DataFrame) -> pd.DataFrame:
     df = df_trees.copy().rename(columns={
         "Bezirk": "bezirk",
@@ -191,7 +180,7 @@ def clean_trees_df(df_trees: pd.DataFrame) -> pd.DataFrame:
     df["district_street_trees"] = df["district_street_trees"].astype(str).str.replace(" ", "", regex=False).astype("Int64")
     return df
 
-
+# Clean census data
 def clean_census_district_df(df_census: pd.DataFrame) -> pd.DataFrame:
     df = df_census.copy().rename(columns={
         "district": "bezirk",
@@ -268,6 +257,7 @@ def clean_census_district_df(df_census: pd.DataFrame) -> pd.DataFrame:
         "women_population_percentage": "district_female_population_percentage",
     })
 
+
     drop_cols = [
         "floor_heating", "block_heating", "stove_heating", "no_heating", "gas_energy",
         "oil_energy", "mixed_energy_sources", "solar_energy", "wood_pellets_energy",
@@ -302,20 +292,14 @@ def clean_census_district_df(df_census: pd.DataFrame) -> pd.DataFrame:
 
     df = df.fillna(0)
 
-    # --- NEW: collapse to one row per bezirk ---
+    # Collapse to one row per bezirk
     num_cols = df.select_dtypes(include=["number", "Int64"]).columns.tolist()
     agg_map = {c: "sum" for c in num_cols}
     out = df.groupby("bezirk", as_index=False).agg(agg_map)
-
-    # final guard
     out = out.drop_duplicates(subset=["bezirk"])  # enforce uniqueness
     return out
 
-
-# -----------------------------
 # Enrichment merge (final Bezirk master)
-# -----------------------------
-
 def build_bezirk_enrichment(
     *,
     bridges: pd.DataFrame,
@@ -353,10 +337,7 @@ def build_bezirk_enrichment(
     return master
 
 
-# -----------------------------
 # Notebook-style Bezirk master (alternate builder)
-# -----------------------------
-
 def build_bezirk_master_notebook_style(
     buildings: pd.DataFrame,
     employment: pd.DataFrame,
