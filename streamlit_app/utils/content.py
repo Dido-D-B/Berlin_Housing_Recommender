@@ -4,6 +4,7 @@ from typing import Dict, Tuple, Any
 from utils.data import load_json as _load_json
 from utils.text import norm as _norm, district_slug  # district_slug kept for future use
 
+# Data paths
 _BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 _DATA_DIR = os.path.join(_BASE_DIR, "data")
 

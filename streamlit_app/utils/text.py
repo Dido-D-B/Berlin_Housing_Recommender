@@ -1,4 +1,4 @@
-# robust dash/whitespace normalization to match keys reliably
+# Robust dash/whitespace normalization to match keys reliably
 _DASHES = "\u2013\u2014\u2012\u2212\u2010\u2011"  # en/em/figure/minus/hyphen variants
 
 # Normalize strings for consistent comparison (dashes, umlauts, ß, whitespace).
