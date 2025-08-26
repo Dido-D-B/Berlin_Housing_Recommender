@@ -31,7 +31,6 @@ def class_to_eur_interpolated(
     v = np.clip(v, xs_arr.min(), xs_arr.max())
     return np.interp(v, xs_arr, ys_arr)
 
-
 # Add affordability metrics (rent/m², estimated rent, rent-to-income, label)
 def add_affordability(
     df: pd.DataFrame,

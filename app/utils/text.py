@@ -1,3 +1,8 @@
+# Imports
+import re
+import string
+from typing import Tuple
+
 # Robust dash/whitespace normalization to match keys reliably
 _DASHES = "\u2013\u2014\u2012\u2212\u2010\u2011"  # en/em/figure/minus/hyphen variants
 
@@ -67,3 +72,39 @@ def de_pretty(s: str) -> str:
     for a, b in [("Ae", "Ä"), ("Oe", "Ö"), ("Ue", "Ü"), ("ae", "ä"), ("oe", "ö"), ("ue", "ü"), ("ss", "ß")]:
         out = out.replace(a, b)
     return out
+
+#
+
+def normalize_text(s: str) -> str:
+    """Lowercase and strip punctuation/whitespace to normalize user queries and titles."""
+    s = s.lower()
+    return s.translate(str.maketrans('', '', string.punctuation)).strip()
+
+def is_definition_query(q: str) -> Tuple[bool, str]:
+    """Return (True, term) if the query looks like 'What is X?'/ 'Define X' / 'Meaning of X'."""
+    q_norm = normalize_text(q)
+    patterns = [
+        r"^what is (.+)$",
+        r"^define (.+)$",
+        r"^meaning of (.+)$",
+    ]
+    for pat in patterns:
+        m = re.match(pat, q_norm)
+        if m:
+            return True, m.group(1).strip()
+    return False, ""
+
+def _clean_markdown(s: str) -> str:
+    """Remove markdown headings and collapse extra whitespace, keeping paragraphs intact."""
+    s = re.sub(r"^#{1,6}\s+.*$", "", s, flags=re.MULTILINE)
+    s = re.sub(r"\n{3,}", "\n\n", s)
+    return s.strip()
+
+def _as_bullets(text: str, max_bullets: int = 4) -> str:
+    """Format first sentence as lead + up to N bullet points from remaining sentences."""
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    if not sentences:
+        return text
+    lead = sentences[0].strip()
+    bullets = [f"- {s.strip()}" for s in sentences[1:1+max_bullets] if s.strip()]
+    return lead + ("\n\n" + "\n".join(bullets) if bullets else "")

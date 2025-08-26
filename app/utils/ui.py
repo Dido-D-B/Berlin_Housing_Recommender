@@ -2,6 +2,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
+import base64
 from typing import Dict, Tuple
 from utils.format import fmt_eur, fmt_int
 
@@ -281,3 +282,34 @@ def render_cluster_legend():
         + "</div>"
     )
     components.html(legend_html, height=60)
+
+# Render Image function (module-level so other pages can import it)
+def render_image(path: str, width: int = 400, height: int = 400, caption: str | None = None, contain: bool = True):
+    """
+    Render an image centered with consistent sizing.
+    - Uses base64 embed by default; falls back to st.image if file read fails.
+    - width/height are fixed pixel dimensions.
+    - contain=True keeps full image visible; set False to crop/cover.
+    - Optional caption rendered beneath the image.
+    """
+    try:
+        with open(path, "rb") as f:
+            img_b64 = base64.b64encode(f.read()).decode()
+        object_fit = "contain" if contain else "cover"
+        st.markdown(
+            f"""
+            <div style="min-height: {height}px; display:flex; align-items:center; justify-content:center;">
+                <img src="data:image/png;base64,{img_b64}" style="width: {width}px; height: {height}px; object-fit: {object_fit}; max-width:100%;">
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    except Exception:
+        st.markdown(
+            f'<div style="min-height: {height}px; display:flex; align-items:center; justify-content:center;">',
+            unsafe_allow_html=True
+        )
+        st.image(path, width=width, output_format="PNG")
+        st.markdown('</div>', unsafe_allow_html=True)
+    if caption:
+        st.caption(caption)

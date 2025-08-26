@@ -1,8 +1,8 @@
 # Imports
-import json
 from __future__ import annotations
 from pathlib import Path
 from typing import Dict, Iterable, Set, Tuple
+import json
 
 # Simple normalizer (handles umlauts + case) so names match reliably 
 _UMLAUT = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss",

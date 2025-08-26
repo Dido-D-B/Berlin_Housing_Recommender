@@ -1,5 +1,6 @@
-# tables_builder.py
 # Run from repo root:  python tables_builder.py --all
+
+# Imports
 from __future__ import annotations
 import os
 import argparse
@@ -7,7 +8,7 @@ import pandas as pd
 import geopandas as gpd
 import logging
 
-# ensure we can import the package
+# Ensure package can be imported
 import sys
 sys.path.append(os.path.abspath("."))
 
@@ -24,7 +25,7 @@ from berlin_housing.poi import (
     merge_poi_to_master,
 )
 
-# ---------- Tourism helpers (robust to header variations) ----------
+# Tourism helpers (robust to header variations)
 def _pick(colnames, candidates, allow_substring=True):
     cols = list(colnames)
     lower_map = {c.lower(): c for c in cols}
@@ -65,7 +66,7 @@ def load_tourism_frames(totals_path, changes_path):
     guests = totals_mini[["Bezirke", "Guests"]]
     return overnight_stays, guests
 
-# ---------- Builders ----------
+# Builders
 def build_bezirk_master() -> pd.DataFrame:
     bridges   = pd.read_csv(config.BRIDGES_CSV)
     cinemas   = pd.read_csv(config.CINEMAS_CSV)
@@ -150,14 +151,14 @@ def build_final_master(ortsteil_with_poi: pd.DataFrame) -> pd.DataFrame:
     # Final master currently equals Ortsteil master enriched with POIs
     return ortsteil_with_poi.copy()
 
-# ---------- Save helpers ----------
+# Save helpers
 def save_outputs(name: str, df: pd.DataFrame, path_csv: str):
     os.makedirs(os.path.dirname(path_csv), exist_ok=True)
     df.to_csv(path_csv, index=False)
     print(f"✓ Saved {name}: {df.shape[0]:,} rows × {df.shape[1]:,} cols")
     print(f"  - {path_csv}")
 
-# ---------- CLI ----------
+# CLI 
 def main():
     ap = argparse.ArgumentParser(description="Build Berlin Housing master tables from raw data.")
     ap.add_argument("--bezirk", action="store_true", help="Build only bezirk master.")
