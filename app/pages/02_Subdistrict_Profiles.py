@@ -11,12 +11,28 @@ from utils.constants import CLUSTER_NAMES as CLUSTER_LABELS, CLUSTER_NOTES, CLUS
 from utils.geo import find_coords_columns, resolve_ortsteil_geojson, pick_feature_name, colorize_geojson_by_cluster 
 from utils.ui import build_profiles_table, render_footer, inject_responsive_css
 
+# Heuristic: find a population column if present
+POP_COL_CANDIDATES = [
+    "total_population",
+    "population_total",
+    "subdistrict_total_population",
+    "ortsteil_total_population",
+    "total_pop",
+    "population"
+]
+
+def _find_population_col(df: pd.DataFrame):
+    for c in POP_COL_CANDIDATES:
+        if c in df.columns:
+            return c
+    return None
+
 # Ensure project root is importable
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-# Page Configurations
+# Page Configuration
 icon_path = os.path.join(PROJECT_ROOT, "streamlit_app", "images", "icon.png")
 st.set_page_config(
     page_title="Berlin Housing - Profiles",
@@ -47,6 +63,7 @@ st.caption("These profiles are based on clustering Berlin’s 96 subdistricts (O
 @st.cache_data(show_spinner=False)
 def _load():
     df = load_master()
+    pop_col = _find_population_col(df)
     # Keep only columns we need for exploration
     base_cols = [c for c in [
         "bezirk", "ortsteil", "k4_cluster",
@@ -54,6 +71,9 @@ def _load():
         "subdistrict_avg_mietspiegel_classification",
         "cafes", "restaurants", "supermarket", "green_space", "schools",
     ] if c in df.columns]
+    # Add population if present
+    if pop_col and pop_col in df.columns:
+        base_cols.append(pop_col)
     # include any coordinate columns if present
     lat_col, lon_col = find_coords_columns(df)
     coord_cols = [c for c in [lat_col, lon_col] if c]
@@ -127,6 +147,15 @@ try:
     # Filter geojson to the subset of displayed Ortsteile
     subset, matched = subset_by_names(gj, df_filt["ortsteil"].unique())
 
+    # Prepare lookups for tooltip enrichment
+    pop_col = _find_population_col(df)
+    tooltip_cols = ["bezirk"]
+    if pop_col:
+        tooltip_cols.append(pop_col)
+    lut_df = df[["ortsteil"] + tooltip_cols].dropna(subset=["ortsteil"]).copy()
+    lut_df["__key"] = lut_df["ortsteil"].astype(str).apply(lambda x: norm(x))
+    LUT = lut_df.set_index("__key").to_dict(orient="index")
+
     # Base outline layer for the whole city (no fill)
     base_outline = pdk.Layer(
         "GeoJsonLayer",
@@ -150,15 +179,28 @@ try:
     subset_colored = {"type": "FeatureCollection", "features": []}
     for ft in subset.get("features", []):
         props = ft.get("properties", {}) or {}
-        name_key = norm(pick_feature_name(props))
+        orig_name = pick_feature_name(props)
+        name_key = norm(orig_name)
         cl = o2c.get(name_key)
-        if cl is None:
-            missing_names.append(name_key)
+        rec = LUT.get(name_key, {})
+
         rgb = CLUSTER_PALETTE.get(cl, [180, 180, 180])
         color = rgb + [80]  # add alpha
         props = dict(props)
+        # Enrich properties for tooltip
         props["fill_color"] = color
         props["k4_cluster"] = cl
+        props["ortsteil_display"] = orig_name
+        if rec:
+            if "bezirk" in rec:
+                props["bezirk"] = rec.get("bezirk")
+            if pop_col and pop_col in rec and rec.get(pop_col) is not None:
+                try:
+                    pop_val = int(float(rec.get(pop_col)))
+                    props["population"] = pop_val
+                    props["population_fmt"] = f"{pop_val:,}".replace(",", ".")  # 1.234.567 style
+                except Exception:
+                    props["population"] = rec.get(pop_col)
         new_ft = dict(ft)
         new_ft["properties"] = props
         subset_colored["features"].append(new_ft)
@@ -183,7 +225,10 @@ try:
         get_line_color=[200, 140, 0, 140],
         line_width_min_pixels=1,
     )
-    tooltip = {"html": "<b>{OTEIL}</b>", "style": {"backgroundColor": "#262730", "color": "white"}}
+    tooltip = {
+        "html": "<b>{ortsteil_display}</b><br/>Bezirk: {bezirk}<br/>Population: {population_fmt}",
+        "style": {"backgroundColor": "#262730", "color": "white"}
+    }
 
     st.pydeck_chart(pdk.Deck(
         map_style="mapbox://styles/mapbox/light-v10",
