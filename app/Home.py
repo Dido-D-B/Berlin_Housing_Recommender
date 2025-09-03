@@ -23,7 +23,7 @@ st.markdown(
     <div style='border: 3px solid #A50034; background-color: #A50034; padding: 15px; text-align: center; border-radius: 6px;'>
         <h1 style='color: white; margin: 0;'>Berlin Housing Explorer</h1>
         <p style='color: white; margin: 5px 0 0; font-size: 14px;'>
-            Created by <a href="https://www.linkedin.com/in/dido-de-boodt/" target="_blank" style="color: white; text-decoration: underline;">Dido De Boodt</a>
+            Project by <a href="https://www.linkedin.com/in/dido-de-boodt/" target="_blank" style="color: white; text-decoration: underline;">Dido De Boodt</a>
         </p>
     </div>
     """,
@@ -100,6 +100,7 @@ with col_left:
     unsafe_allow_html=True)
 
     # Recommender
+    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)    
     st.markdown("<h3 style='color:#A50034;'>Recommender</h3>", unsafe_allow_html=True)
     st.markdown(HOME_COPY["recommender"])
 
@@ -117,16 +118,16 @@ col_left, col_right = st.columns([2, 1])
 
 # How to use part 2
 with col_left:
-    # Districts
-    st.markdown("<h3 style='color:#A50034;'>Districts</h3>", unsafe_allow_html=True)
-    st.markdown(HOME_COPY["districts"])
-
     # Cencus
-    st.markdown("<h3 style='color:#A50034;'>Berlin Census Dashboard</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color:#A50034;'>Berlin Census</h3>", unsafe_allow_html=True)
     st.markdown(HOME_COPY["census"])
 
+    # Behind the data
+    st.markdown("<h3 style='color:#A50034;'>Behind the data</h3>", unsafe_allow_html=True)
+    st.markdown(HOME_COPY["data"])
+
     # Bookmarks
-    st.markdown("<h3 style='color:#A50034;'>Bookmark favorites</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color:#A50034;'>Q&A and Bookmarks</h3>", unsafe_allow_html=True)
     st.markdown(HOME_COPY["bookmarks"])
 
 # Image Berlin Bear in the city   
@@ -145,6 +146,7 @@ with col_left:
         """,
         unsafe_allow_html=True)
     st.markdown("")
+    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
     st.markdown(HOME_COPY["datasources"])
 
 # Image Berlin Bear Data Analyst
@@ -155,30 +157,31 @@ st.divider()
 
 col_left, col_right = st.columns([2, 1])
 with col_left:
-    # Tools & Stack
+    # Tools 
     st.markdown("""
     <div style='border: 2px solid #A50034; background-color: #A50034; padding: 8px; text-align: center; border-radius: 4px;'>
-        <h2 style='color: white; margin: 0; font-size: 20px;'>Tools & stack</h2>
+        <h2 style='color: white; margin: 0; font-size: 20px;'>Tools</h2>
     </div>
     """,
     unsafe_allow_html=True)
-    st.markdown("<h3 style='color:#A50034;'>Tools</h3>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)    
     st.markdown(HOME_COPY["tools"])
- 
-    # Notes
-    st.markdown("<h3 style='color:#A50034;'>Notes on processing & feature engineering</h3>", unsafe_allow_html=True)
-    st.markdown(HOME_COPY["notes"])
+    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+
+    # Images Credits
+    st.markdown("""
+    <div style='border: 2px solid #A50034; background-color: #A50034; padding: 8px; text-align: center; border-radius: 4px;'>
+        <h2 style='color: white; margin: 0; font-size: 20px;'>Images</h2>
+    </div>
+    """,
+    unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+    st.markdown(HOME_COPY["images"])
 
 st.divider()
-
-# Images Credits
-st.markdown("<h3 style='color:#A50034;'>Images</h3>", unsafe_allow_html=True)
-st.markdown(HOME_COPY["images"])
 
 # Image Berlin Bear Data Scientist
 with col_right:
     render_image(os.path.join(os.path.dirname(__file__), "images", "bear_python.png"))
-
-st.divider()
 
 render_footer()

@@ -8,24 +8,10 @@ import pydeck as pdk
 from berlin_housing.io import load_master
 from services.geo import load_geojson, subset_by_names, norm
 from utils.constants import CLUSTER_NAMES as CLUSTER_LABELS, CLUSTER_NOTES, CLUSTER_PALETTE, LABEL_TO_ID
-from utils.geo import find_coords_columns, resolve_ortsteil_geojson, pick_feature_name, colorize_geojson_by_cluster 
+from utils.geo import pick_feature_name
 from utils.ui import build_profiles_table, render_footer, inject_responsive_css
-
-# Heuristic: find a population column if present
-POP_COL_CANDIDATES = [
-    "total_population",
-    "population_total",
-    "subdistrict_total_population",
-    "ortsteil_total_population",
-    "total_pop",
-    "population"
-]
-
-def _find_population_col(df: pd.DataFrame):
-    for c in POP_COL_CANDIDATES:
-        if c in df.columns:
-            return c
-    return None
+from utils.content import get_district_blurb, get_subdistrict_blurb, get_image_credit
+from utils.data import _load
 
 # Ensure project root is importable
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -33,7 +19,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 # Page Configuration
-icon_path = os.path.join(PROJECT_ROOT, "streamlit_app", "images", "icon.png")
+icon_path = os.path.join(PROJECT_ROOT, "app", "images", "icon.png")
 st.set_page_config(
     page_title="Berlin Housing - Profiles",
     page_icon=icon_path,
@@ -43,46 +29,35 @@ st.set_page_config(
 # CSS
 inject_responsive_css()
 
+# Helper: prettify names with German umlauts and title case
+def format_german_title(name: str) -> str:
+    if not isinstance(name, str):
+        return str(name)
+    s = name.replace("ae", "ä").replace("oe", "ö").replace("ue", "ü")
+    s = s.replace("Ae", "Ä").replace("Oe", "Ö").replace("Ue", "Ü")
+    return s.title()
+
 # UI
 st.markdown(
     """
     <div style='border: 3px solid #A50034; background-color: #A50034; padding: 15px; text-align: center; border-radius: 6px;'>
-        <h1 style='color: white; margin: 0;'>Subdistrict Profiles</h1>
+        <h1 style='color: white; margin: 0;'>Berlin Subdistrict Profiles</h1>
+        <p style='color: white; margin: 5px 0 0; font-size: 14px;'>
+            Project by <a href="https://www.linkedin.com/in/dido-de-boodt/" target="_blank" style="color: white; text-decoration: underline;">Dido De Boodt</a>
+        </p>
     </div>
     """,
-    unsafe_allow_html=True,
-)
-st.markdown(
-    "<h3 style='color: #A50034;'>Filter for subdstrict profile(s)</h3>",
-    unsafe_allow_html=True,
-)
-st.write("See the subdistricts on a map colored by their profile and explore their features in a summary table!")
+    unsafe_allow_html=True)
+
+st.divider()
+st.markdown("""**Explore the subdstricts and their profiles** - The map shows Berlin’s subdistricts colored by their profiles. Use the settings in the sidebar to filter the map and summary table by subdistrict profile(s), or pick a subdistrict from the drop-down menu to explore it in detail.""")
+st.divider()
 st.caption("These profiles are based on clustering Berlin’s 96 subdistricts (Ortsteile) using demographic, housing, and amenity data. Each cluster groups areas with similar rent levels, income patterns, and local amenities into lifestyle categories.")
+if st.button("💡 Learn how the cluster profiles were created", key="to_behind_data"):
+    st.switch_page("../app/pages/04_Behind_the_data.py")
 
 # Load data
-@st.cache_data(show_spinner=False)
-def _load():
-    df = load_master()
-    pop_col = _find_population_col(df)
-    # Keep only columns we need for exploration
-    base_cols = [c for c in [
-        "bezirk", "ortsteil", "k4_cluster",
-        "subdistrict_avg_median_income_eur",
-        "subdistrict_avg_mietspiegel_classification",
-        "cafes", "restaurants", "supermarket", "green_space", "schools",
-    ] if c in df.columns]
-    # Add population if present
-    if pop_col and pop_col in df.columns:
-        base_cols.append(pop_col)
-    # include any coordinate columns if present
-    lat_col, lon_col = find_coords_columns(df)
-    coord_cols = [c for c in [lat_col, lon_col] if c]
-    use_cols = list(dict.fromkeys(base_cols + coord_cols))
-    # resolve geojson path via helper
-    geo_path = resolve_ortsteil_geojson(PROJECT_ROOT)
-
-    return df[use_cols].copy(), lat_col, lon_col, geo_path
-
+df = load_master()
 df, LAT_COL, LON_COL, GEO_PATH = _load()
 
 all_clusters = sorted(df["k4_cluster"].dropna().unique().tolist())
@@ -90,23 +65,39 @@ all_cluster_labels = [CLUSTER_LABELS.get(i, str(i)) for i in all_clusters]
 
 # Sidebar filters
 with st.sidebar:
-    st.header("⚙️ Filter")
+    st.header("⚙️ Settings")
     clusters_labels = st.multiselect(
-        "Select clusters",
+        "Select Subdistrict Profile(s)",
         options=all_cluster_labels,
         default=all_cluster_labels,
         help="Choose one or more lifestyle clusters",
     )
     # Map labels back to numeric IDs for filtering
     clusters = [LABEL_TO_ID.get(lbl, lbl) for lbl in clusters_labels]
-    search = st.text_input("Search subdistrict (Ortsteil)", value="")
+    # Only offer Ortsteile that belong to the selected clusters
+    df_cluster_scope = df[df["k4_cluster"].isin(clusters)]
+    raw_orts = sorted(df_cluster_scope["ortsteil"].dropna().astype(str).unique().tolist())
+    display_orts = [format_german_title(o) for o in raw_orts]
+    DISP2RAW = dict(zip(display_orts, raw_orts))
+
+    # Subdistrict drop-down (shows pretty names but we retain mapping to raw values)
+    selected_ort_disp = st.selectbox(
+        "Subdistrict (Ortsteil)",
+        options=["All subdistricts"] + display_orts,
+        index=0,
+        help="Start typing to quickly find an Ortsteil. List reflects the selected clusters.",
+        key="ort_select",
+    )
+
+    # Resolve the selected display label back to the raw ortsteil value
+    sel_raw = None
+    if selected_ort_disp and selected_ort_disp != "All subdistricts":
+        sel_raw = DISP2RAW.get(selected_ort_disp, selected_ort_disp)
 
 # Filter the frame
 mask = df["k4_cluster"].isin(clusters)
-if search:
-    norm_search = norm(search)
-    mask &= df["ortsteil"].apply(lambda x: norm(str(x))).str.contains(norm_search, case=False, na=False)
-
+if sel_raw:
+    mask &= df["ortsteil"].astype(str) == sel_raw
 df_filt = df[mask].copy()
 
 # Profile cards
@@ -123,24 +114,9 @@ for i, lbl in enumerate(labels_to_show):
         )
         st.write(CLUSTER_NOTES.get(cid, ""))
 
-
-# Map (allow manual selection if auto-detect failed)
-if not GEO_PATH or not os.path.isfile(GEO_PATH):
-    st.warning("GeoJSON not found at the usual locations.")
-    default_guess = os.path.join(PROJECT_ROOT, "data", "processed", "berlin_ortsteil_boundaries.geojson")
-    user_geo = st.text_input(
-        "Path to GeoJSON (absolute or relative to project root):",
-        value=default_guess,
-    )
-    if user_geo:
-        guess = user_geo
-        if not os.path.isabs(guess):
-            guess = os.path.join(PROJECT_ROOT, guess)
-        if os.path.isfile(guess):
-            GEO_PATH = guess
-
-if not GEO_PATH or not os.path.isfile(GEO_PATH):
-    st.stop()
+# Map
+MAP_HEIGHT = 650  # Height for the map canvas
+GEO_PATH = os.path.join(PROJECT_ROOT, "data", "berlin_ortsteil_boundaries.geojson")
 
 try:
     gj = load_geojson(GEO_PATH)
@@ -148,7 +124,7 @@ try:
     subset, matched = subset_by_names(gj, df_filt["ortsteil"].unique())
 
     # Prepare lookups for tooltip enrichment
-    pop_col = _find_population_col(df)
+    pop_col = "total_population" if "total_population" in df.columns else None
     tooltip_cols = ["bezirk"]
     if pop_col:
         tooltip_cols.append(pop_col)
@@ -230,14 +206,19 @@ try:
         "style": {"backgroundColor": "#262730", "color": "white"}
     }
 
-    st.pydeck_chart(pdk.Deck(
-        map_style="mapbox://styles/mapbox/light-v10",
-        initial_view_state=view_state,
-        layers=[base_outline, geo_layer],
-        views=[pdk.View("MapView")],
-        tooltip=tooltip,
-        map_provider="mapbox",
-    ))
+    st.pydeck_chart(
+        pdk.Deck(
+            map_style="mapbox://styles/mapbox/light-v10",
+            initial_view_state=view_state,
+            layers=[base_outline, geo_layer],
+            views=[pdk.View("MapView")],
+            tooltip=tooltip,
+            map_provider="mapbox",
+        ),
+        height=MAP_HEIGHT,
+        use_container_width=True,
+    )
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     st.caption(f"Boundary map from GeoJSON file (Berlin Open Data)")
 
     if missing_names:
@@ -258,16 +239,12 @@ st.markdown(
 )
 st.write("Subdistricts shown: ", len(df_filt))
 st.write("Clusters selected: ", len(clusters))
-
-if not df_filt.empty:
-    display_df = build_profiles_table(df_filt, CLUSTER_LABELS)
-    st.caption("The ‘Avg. Mietspiegel class’ shows the average residential location category (Wohnlage) of all streets in a subdistrict, from 1 (simple) to 4 (very good). Higher values indicate more desirable locations with higher rents.")
-    with st.expander("What is the Mietspiegel classification?"):
-        st.markdown(
+with st.expander("💡 What is the Mietspiegel classification?"):
+    st.markdown(
             """
-               The Berliner Mietspiegel is the official rent index published by the city of Berlin. Every street (and even house number ranges) is assigned a Wohnlage (residential location) class that reflects how desirable and expensive the location is considered.
+               The *Berliner Mietspiegel* is the official rent index published by the city of Berlin. Every street (and even house number ranges) is assigned a Wohnlage (residential location) class that reflects how desirable and expensive the location is considered.
             """)
-        st.markdown(
+    st.markdown(
             """
                **The classes are**:
                * 1 = einfache Wohnlage (simple location): lower demand, fewer amenities, lower rents.
@@ -276,6 +253,161 @@ if not df_filt.empty:
                * 4 = sehr gute Wohnlage (very good location): top addresses, prestigious neighborhoods, highest rents.
             """
         )
+
+# Sort Table Summary
+st.markdown(
+    "<div style='margin-top:8px;'><b>Sort by</b></div>",
+    unsafe_allow_html=True,
+)
+sort_choice = st.radio(
+    "Sort presets",
+    options=["District", "Most Green", "Most Schools", "Most Night Life", "Most Affordable"],
+    index=0,
+    horizontal=True,
+    label_visibility="collapsed",
+)
+
+# Table
+if not df_filt.empty:
+    # If a single subdistrict is selected, show its cultural summary and KPI compare
+    if 'selected_ort_disp' in locals() and selected_ort_disp and selected_ort_disp != "All subdistricts":
+        with st.expander("Cultural facts & context", expanded=True):
+            # locate the selected row safely using the raw ortsteil value
+            try:
+                _row = df.loc[df["ortsteil"].astype(str) == sel_raw].iloc[0]
+            except Exception:
+                _row = {}
+            bezirk_raw = str(_row.get("bezirk", "")).strip() if isinstance(_row, pd.Series) else ""
+            bezirk_disp = format_german_title(bezirk_raw) if bezirk_raw else ""
+            ortsteil_disp = selected_ort_disp
+
+            # District facts
+            d_info = get_district_blurb(bezirk_disp) if bezirk_disp else {}
+            if d_info.get("blurb"):
+                st.markdown("#### District: " + bezirk_disp)
+                st.write(d_info.get("blurb"))
+
+            # Subdistrict facts
+            sd_info = get_subdistrict_blurb(bezirk_disp, ortsteil_disp)
+            if sd_info.get("blurb"):
+                st.markdown("#### Subdistrict: " + ortsteil_disp)
+                st.write(sd_info.get("blurb"))
+
+    display_df = build_profiles_table(df_filt, CLUSTER_LABELS)
+
+    try:
+        needed = [c for c in ["bar", "nightclub"] if c in df_filt.columns]
+        if needed and "Subdistrict" in display_df.columns and "ortsteil" in df_filt.columns:
+            left = display_df.copy()
+            left["__key"] = left["Subdistrict"].astype(str).apply(lambda x: norm(x))
+
+            right = df_filt[["ortsteil"] + needed].copy()
+            right["__key"] = right["ortsteil"].astype(str).apply(lambda x: norm(x))
+
+            display_df = (
+                left.merge(right[["__key"] + needed], on="__key", how="left")
+                    .drop(columns=["__key"], errors="ignore")
+            )
+    except Exception:
+        pass
+
+    # Clean up headers for presentation
+    rename_map = {}
+    if "bar" in display_df.columns:
+        rename_map["bar"] = "Bars"
+    if "nightclub" in display_df.columns:
+        rename_map["nightclub"] = "Nightclubs"
+    if rename_map:
+        display_df = display_df.rename(columns=rename_map)
+
+    # Apply sort to the DISPLAY table (not the raw df)
+    if sort_choice and sort_choice != "District":
+        import unicodedata
+        # Map preset to likely display column names via keyword matching
+        keyword_map = {
+            "Most Green": ["green", "🌳"],
+            "Most Schools": ["school"],
+            # Prefer Bars, then Cafés for Night Life
+            "Most Night Life": ["bars", "bar", "cafes", "cafés", "café", "night", "club", "pub", "nightclub", "nightclubs"],
+            # Only Mietspiegel/Wohnlage, not generic terms that collide with income
+            "Most Affordable": ["mietspiegel", "wohnlage"],
+        }
+        def _ascii_lower(s: str) -> str:
+            try:
+                return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
+            except Exception:
+                return str(s).lower()
+        def pick_display_col(df_cols, keywords):
+            cols_norm = [(c, _ascii_lower(c)) for c in df_cols]
+            # 1) Exact keyword match first
+            for kw in keywords:
+                for c_orig, c_norm in cols_norm:
+                    if c_norm == kw:
+                        return c_orig
+            # 2) Prefer startswith matches
+            for kw in keywords:
+                for c_orig, c_norm in cols_norm:
+                    if c_norm.startswith(kw):
+                        return c_orig
+            # 3) Then contains matches
+            for kw in keywords:
+                for c_orig, c_norm in cols_norm:
+                    if kw in c_norm:
+                        return c_orig
+            return None
+
+        # Special handling: if Most Affordable, explicitly prefer the Mietspiegel/Wohnlage column
+        if sort_choice == "Most Affordable":
+            # Exact header first
+            if "Avg. Mietspiegel class" in display_df.columns:
+                target_col = "Avg. Mietspiegel class"
+            else:
+                # any column that clearly refers to Mietspiegel/Wohnlage
+                pref = [c for c in display_df.columns if _ascii_lower(c).find("mietspiegel") >= 0 or _ascii_lower(c).find("wohnlage") >= 0]
+                target_col = pref[0] if pref else None
+        elif sort_choice == "Most Night Life":
+            if "Nightclubs" in display_df.columns:
+                target_col = "Nightclubs"
+            elif "Bars" in display_df.columns:
+                target_col = "Bars"
+            elif "nightclub" in display_df.columns:
+                target_col = "nightclub"
+            elif "bar" in display_df.columns:
+                target_col = "bar"
+            elif "bars" in display_df.columns:
+                target_col = "bars"
+            else:
+                target_col = None
+        else:
+            target_col = None
+        if target_col is None:
+            target_col = pick_display_col(display_df.columns, keyword_map.get(sort_choice, []))
+
+        if target_col:
+            # Replaced block for robust numeric cleaning
+            ser = display_df[target_col]
+            # Robust numeric coercion: collapse thin/regular spaces and strip non-digits (keeps minus)
+            cleaned = (
+                ser.astype(str)
+                   .str.replace("\u00A0", " ")             # NBSP -> space
+                   .str.replace(r"\s+", "", regex=True)     # remove any spaces (e.g., "1 383" -> "1383")
+                   .str.replace(r"[^\d\-\.]", "", regex=True)  # drop currency and other symbols
+            )
+            # If both ',' and '.' are possible in source, at this stage only '.' may remain; treat as decimal if present
+            num = pd.to_numeric(cleaned, errors="coerce")
+            if num.notna().mean() >= 0.5:
+                display_df["__sortkey__"] = num
+                asc = True if sort_choice == "Most Affordable" else False
+                display_df = display_df.sort_values("__sortkey__", ascending=asc, na_position="last").drop(columns="__sortkey__")
+            else:
+                asc = True if sort_choice == "Most Affordable" else False
+                display_df = display_df.sort_values(target_col, ascending=asc, key=lambda s: s.astype(str).str.lower())
+    elif sort_choice == "District":
+        # Try to sort by the first column (usually the Ortsteil name) if present
+        first_col = display_df.columns[0] if len(display_df.columns) > 0 else None
+        if first_col:
+            display_df = display_df.sort_values(first_col, ascending=True, key=lambda s: s.astype(str).str.lower())
+
     st.dataframe(display_df, hide_index=True, use_container_width=True)
 else:
     st.warning("No rows match the current filters.")

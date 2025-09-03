@@ -19,13 +19,11 @@ Possibly. While the current focus is Berlin, the same framework could be adapted
 
 ### Who owns or maintains this project? / Who is behind this project? / Who built this?
 
-This project is created and maintained by **Dido De Boodt**, a Data Analyst & Data Science student based in Berlin. Dido combines skills in Python, SQL, Tableau, and Machine Learning with a strong background in customer care and social impact projects.
+This project is created and maintained by **Dido De Boodt**, a Data Analyst & Data Science student based in Berlin. Dido combines skills in Python, SQL, Tableau, and Machine Learning with a strong background in customer care and social impact projects. Feel free to reach out!
 
-Feel free to reach out!
-
-- [LinkedIn](https://www.linkedin.com/in/dido-de-boodt/)  
-- [GitHub](https://github.com/Dido-D-B)  
-- [Tableau Public](https://public.tableau.com/app/profile/dido.de.boodt/vizzes)
+* [LinkedIn](https://www.linkedin.com/in/dido-de-boodt/)  
+* [GitHub](https://github.com/Dido-D-B)  
+* [Tableau Public](https://public.tableau.com/app/profile/dido.de.boodt/vizzes)
 
 ### Who is this for? / Who can benefit from this project?
 

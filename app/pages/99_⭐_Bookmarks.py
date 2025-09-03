@@ -78,7 +78,5 @@ else:
             file_name="berlin_bookmarks.json",
             mime="application/json",
         )
-
-st.caption("Tip: use the back/forward buttons or the sidebar to navigate.")
-
+        
 render_footer()

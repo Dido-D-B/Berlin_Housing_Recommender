@@ -30,18 +30,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
-
-st.markdown(
-    """
-    Ask your questions about the **Berlin Housing Affordability Project** and web app here!  
-    
-    Type a question in the chat box below - Ask in natural language; multiple phrasings work.
-    For definitions, start with **“What is …”** (e.g., *What is Mietspiegel?*).
-    """
-)
-
-st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+st.divider()
+st.markdown("""**Ask your questions!** - The project assistant can answer (most of) your questions about this project and the web. Type a question in the chat box below.""")
+st.caption("Ask in natural language; multiple phrasings work. For definitions, start with “What is …” (e.g. What is Mietspiegel?).")
+st.divider()
 
 with st.expander("About this assistant", expanded=False):
     st.markdown(
