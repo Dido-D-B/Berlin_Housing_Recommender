@@ -1,22 +1,43 @@
-# Imports
-import os, sys
-import streamlit as st
-from services.recommender import get_top_k
-from berlin_housing.config import DEFAULT_CLUSTER_COL
-from utils.bookmarks import add_bookmark, remove_bookmark, is_bookmarked
-from utils.text import _DASHES, norm, normalize_filename_base, district_slug, de_pretty
-from utils.data import load_json
-from utils.content import get_district_blurb, get_subdistrict_blurb, get_image_credit
-from utils.geo import find_district_images
-from utils.geo import IMAGES_DIR
-from utils.constants import CLUSTER_LABELS, CLUSTER_NOTES
-from utils.ui import render_footer, render_subdistrict_reco_table, inject_responsive_css
-from PIL import Image, ImageOps
+"""
+01_Recommender.py
+
+Streamlit page for the Berlin Housing Explorer – Subdistrict Recommender.
+
+This page lets users:
+- Select preferred **subdistrict profiles** (Balanced, Vibrant, Affordable, Prestige)
+- Provide **household type** (Single, Couple, Family, WG, Senior) to estimate a reasonable m²
+- Set **income** and **affordability threshold** (rent/income)
+- Optionally boost **amenities** (cafés, schools, green spaces, transit, etc.) and prefer quieter areas
+- Choose result count and allow a **relaxed threshold** fallback
+
+Flow:
+1) Collect inputs from the sidebar and derive a household-based apartment size if enabled.
+2) Call `services.recommender.get_top_k(...)` to compute candidates.
+3) Apply lightweight POI-based weighting for ranking (household weights + optional amenity boosts).
+4) Render a standardized results table with selection and **bookmark** actions.
+5) When rows are selected, show the cluster profile notes and **cultural facts** (district & subdistrict) with images.
+
+All data processing is local to the session; no inputs are stored server-side.
+"""
 
 # Ensure project root is importable
+import os, sys
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
+# Imports
+import streamlit as st
+from services.recommender import get_top_k, estimate_required_sqm
+from berlin_housing.config import DEFAULT_CLUSTER_COL
+from utils.bookmarks import add_bookmark, remove_bookmark, is_bookmarked
+from utils.text import de_pretty
+from utils.content import get_district_blurb, get_subdistrict_blurb, get_image_credit
+from utils.geo import find_district_images
+from utils.geo import IMAGES_DIR
+from utils.constants import CLUSTER_LABELS, CLUSTER_NOTES, HOUSEHOLD_M2, HH_WEIGHTS, AMENITY_COLUMNS
+from utils.ui import render_footer, render_subdistrict_reco_table, inject_responsive_css
+from PIL import Image, ImageOps
 
 # Page Configurations
 icon_path = os.path.join(PROJECT_ROOT, "app", "images", "icon.png")
@@ -29,51 +50,6 @@ st.set_page_config(
 
 # CSS
 inject_responsive_css()
-
-# Household size assumptions (for quick affordability by household type) 
-HOUSEHOLD_M2 = {
-    "Single": 35,
-    "Couple": 55,
-    "Family": {"base": 55, "per_child": 15},   # 55 + 15 per child
-    "WG": {"per_person": 18},                  # per person (private room + shared areas)
-    "Senior": 40,
-}
-
-# Estimate required apartment size
-def estimate_required_sqm(hh_type: str, *, children: int = 0, wg_people: int = 3) -> int:
-    if hh_type == "Single":
-        return HOUSEHOLD_M2["Single"]
-    if hh_type == "Couple":
-        return HOUSEHOLD_M2["Couple"]
-    if hh_type == "Family":
-        return HOUSEHOLD_M2["Family"]["base"] + children * HOUSEHOLD_M2["Family"]["per_child"]
-    if hh_type == "WG":
-        return wg_people * HOUSEHOLD_M2["WG"]["per_person"]
-    if hh_type == "Senior":
-        return HOUSEHOLD_M2["Senior"]
-    return HOUSEHOLD_M2["Single"]
-
-# Household-type POI weighting for ranking (applied if columns exist in results)
-HH_WEIGHTS = {
-    "Family": {"green_spaces": 1.0, "playgrounds": 1.0, "schools": 0.8, "nightclub": -0.5},
-    "WG": {"cafes": 0.7, "bar": 0.7, "restaurant": 0.4, "transit_stops": 0.8},
-    "Senior": {"green_spaces": 0.8, "pharmacies": 0.8, "clinics": 0.6, "nightclub": -0.4},
-}
-
-# Amenity columns mapping (UI label -> dataframe column). Only applied if the column exists in results.
-AMENITY_COLUMNS = {
-    "Cafes": "cafes",
-    "Restaurants": "restaurant",
-    "Bars": "bar",
-    "Nightclubs": "nightclub",
-    "Green spaces": "green_spaces",
-    "Playgrounds": "playgrounds",
-    "Schools": "schools",
-    "Libraries": "libraries",
-    "Transit access": "transit_stops",
-    "Pharmacies": "pharmacies",
-    "Clinics": "clinics",
-}
 
 # Helper: center-crop & resize images to a fixed card size (pixel-perfect alignment)
 @st.cache_data(show_spinner=False)
@@ -434,8 +410,8 @@ else:
 
                     # Subdistrict facts
                     if sd_info.get("blurb"):
-                         st.markdown("#### Subdistrict: " + de_pretty(ortsteil_val))
-                         st.write(sd_info.get("blurb"))
+                        st.markdown("#### Subdistrict: " + de_pretty(ortsteil_val))
+                        st.write(sd_info.get("blurb"))
 
             st.caption("Tip: tick one or more rows to see the matching cluster profile and subdistrict descriptions.")
         

@@ -1,10 +1,26 @@
-# Imports
+"""
+02_Subdistrict_Profiles.py
+
+Streamlit page to explore Berlin subdistrict (Ortsteil) profiles on an interactive map
+and summary table. Users can filter by lifestyle clusters and drill into cultural facts.
+
+The page:
+- Loads the master dataset and GeoJSON boundaries
+- Filters data by selected clusters and (optionally) a chosen Ortsteil
+- Colors subdistrict polygons by cluster and renders a deck.gl map
+- Shows a tidy table with POIs and optional sorting presets
+"""
+
+# Ensure project root is importable
 import os, sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+# Imports    
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
-
-# Core loaders
 from berlin_housing.io import load_master
 from services.geo import load_geojson, subset_by_names, norm
 from utils.constants import CLUSTER_NAMES as CLUSTER_LABELS, CLUSTER_NOTES, CLUSTER_PALETTE, LABEL_TO_ID
@@ -12,11 +28,7 @@ from utils.geo import pick_feature_name
 from utils.ui import build_profiles_table, render_footer, inject_responsive_css
 from utils.content import get_district_blurb, get_subdistrict_blurb, get_image_credit
 from utils.data import _load
-
-# Ensure project root is importable
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+from utils.text import format_german_title
 
 # Page Configuration
 icon_path = os.path.join(PROJECT_ROOT, "app", "images", "icon.png")
@@ -28,14 +40,6 @@ st.set_page_config(
 
 # CSS
 inject_responsive_css()
-
-# Helper: prettify names with German umlauts and title case
-def format_german_title(name: str) -> str:
-    if not isinstance(name, str):
-        return str(name)
-    s = name.replace("ae", "ä").replace("oe", "ö").replace("ue", "ü")
-    s = s.replace("Ae", "Ä").replace("Oe", "Ö").replace("Ue", "Ü")
-    return s.title()
 
 # UI
 st.markdown(
@@ -52,12 +56,13 @@ st.markdown(
 st.divider()
 st.markdown("""**Explore the subdstricts and their profiles** - The map shows Berlin’s subdistricts colored by their profiles. Use the settings in the sidebar to filter the map and summary table by subdistrict profile(s), or pick a subdistrict from the drop-down menu to explore it in detail.""")
 st.divider()
+
 st.caption("These profiles are based on clustering Berlin’s 96 subdistricts (Ortsteile) using demographic, housing, and amenity data. Each cluster groups areas with similar rent levels, income patterns, and local amenities into lifestyle categories.")
+
 if st.button("💡 Learn how the cluster profiles were created", key="to_behind_data"):
     st.switch_page("../app/pages/04_Behind_the_data.py")
 
 # Load data
-df = load_master()
 df, LAT_COL, LON_COL, GEO_PATH = _load()
 
 all_clusters = sorted(df["k4_cluster"].dropna().unique().tolist())
@@ -116,7 +121,7 @@ for i, lbl in enumerate(labels_to_show):
 
 # Map
 MAP_HEIGHT = 650  # Height for the map canvas
-GEO_PATH = os.path.join(PROJECT_ROOT, "data", "berlin_ortsteil_boundaries.geojson")
+GEO_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "berlin_ortsteil_boundaries.geojson")
 
 try:
     gj = load_geojson(GEO_PATH)

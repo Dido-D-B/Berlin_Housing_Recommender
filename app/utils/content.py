@@ -1,3 +1,15 @@
+"""
+content.py
+
+Utilities for the Q&A/Explain page and content lookups used across the app.
+
+This module:
+- Loads project documentation (FAQ, glossary, methods) from `docs/`
+- Builds a TF–IDF searchable corpus of chunks
+- Retrieves the most relevant chunks for a user query and synthesizes a concise answer
+- Looks up district/subdistrict cultural blurbs and image credits
+"""
+
 # Imports
 import os
 import re
@@ -71,9 +83,14 @@ _IMAGE_CREDITS = _load_json(IMAGE_CREDITS_PATH) or {}
 
 # Public API
 def get_district_blurb(bezirk: str) -> dict:
-    """Return dict with keys {blurb, image_path, source} or {} if missing.
+    """
+    Get the cultural blurb for a district.
 
-    Looks up by normalized district name.
+    Args:
+        bezirk (str): District name.
+
+    Returns:
+        dict: Dict with optional keys {blurb, image_path, source}; empty dict if not found.
     """
     if not bezirk:
         return {}
@@ -81,9 +98,15 @@ def get_district_blurb(bezirk: str) -> dict:
 
 # Lookup subdistrict blurb by normalized district + subdistrict name.
 def get_subdistrict_blurb(bezirk: str, ortsteil: str) -> dict:
-    """Return dict with keys {blurb, image_path, source, bezirk, ortsteil} or {} if missing.
+    """
+    Get the cultural blurb for a (district, subdistrict) pair.
 
-    Looks up by normalized (district, subdistrict) pair.
+    Args:
+        bezirk (str): District name.
+        ortsteil (str): Subdistrict name.
+
+    Returns:
+        dict: Dict with optional keys {blurb, image_path, source, bezirk, ortsteil}; empty if not found.
     """
     if not bezirk or not ortsteil:
         return {}
@@ -91,8 +114,15 @@ def get_subdistrict_blurb(bezirk: str, ortsteil: str) -> dict:
 
 # Image credits API
 def get_image_credit(bezirk: str, idx: int) -> str:
-    """Return the credit line for the district image at zero-based index idx.
-    Uses the credits JSON mapping: slug -> list[str]. Returns empty string if missing.
+    """
+    Return the credit line for a district image by index.
+
+    Args:
+        bezirk (str): District name.
+        idx (int): Zero-based image index.
+
+    Returns:
+        str: Credit text, or empty string if missing.
     """
     if not bezirk or idx is None or idx < 0:
         return ""
@@ -110,7 +140,15 @@ def get_image_credit(bezirk: str, idx: int) -> str:
 
 # ---------- file reading / parsing ----------
 def read_docs(docs_dir: str) -> List[Tuple[str, str]]:
-    """Return list of (path, text) for .md and .txt files in docs_dir."""
+    """
+    Read all `.md` and `.txt` files under a docs directory.
+
+    Args:
+        docs_dir (str): Root directory of documentation.
+
+    Returns:
+        list[tuple[str,str]]: List of (path, text) pairs.
+    """
     paths = glob.glob(os.path.join(docs_dir, "**/*.md"), recursive=True) + \
             glob.glob(os.path.join(docs_dir, "**/*.txt"), recursive=True)
     results: List[Tuple[str, str]] = []
@@ -124,7 +162,15 @@ def read_docs(docs_dir: str) -> List[Tuple[str, str]]:
     return results
 
 def extract_glossary_entries(glossary_path: str) -> List[Dict]:
-    """Parse **Term**: Definition lines into glossary chunks."""
+    """
+    Parse `**Term**: Definition` lines from `glossary.md` into small chunks.
+
+    Args:
+        glossary_path (str): Path to `glossary.md`.
+
+    Returns:
+        list[dict]: Glossary entries with id, path, title, content, source.
+    """
     entries: List[Dict] = []
     if not os.path.isfile(glossary_path):
         return entries
@@ -150,8 +196,18 @@ def extract_glossary_entries(glossary_path: str) -> List[Dict]:
 
 def split_into_chunks(path: str, text: str, max_chars: int = 1200) -> List[Dict]:
     """
-    Chunk by headings/paragraphs; special handling for faq.md (split per '###' question).
-    Returns list of dicts with: id, path, title, content.
+    Split a document into concise chunks for retrieval.
+
+    - Special handling for `faq.md` (one chunk per `###` question)
+    - Otherwise splits by headings and packs paragraphs up to `max_chars`
+
+    Args:
+        path (str): Source file path.
+        text (str): File contents.
+        max_chars (int): Maximum characters per chunk (default 1200).
+
+    Returns:
+        list[dict]: Chunks with {id, path, title, content}.
     """
     base = os.path.basename(path).lower()
     chunks: List[Dict] = []
@@ -227,7 +283,15 @@ else:
 
 @cache_data(show_spinner=False)
 def build_corpus(docs_dir: str):
-    """Build chunks + TF-IDF matrix from docs and glossary."""
+    """
+    Build a TF–IDF corpus from docs and glossary.
+
+    Args:
+        docs_dir (str): Root directory of documentation.
+
+    Returns:
+        tuple: (chunks: list[dict], vectorizer: TfidfVectorizer | None, X: scipy.sparse.csr_matrix | None)
+    """
     docs = read_docs(docs_dir)
     all_chunks: List[Dict] = []
     for p, t in docs:
@@ -243,7 +307,21 @@ def build_corpus(docs_dir: str):
 
 # ---------- retrieval / synthesis ----------
 def retrieve(query: str, chunks: List[Dict], vectorizer, X, top_k: int = 5) -> List[Dict]:
-    """Definition first; then exact/fuzzy FAQ; else TF-IDF ranking with boosts."""
+    """
+    Retrieve the most relevant chunks for a query.
+
+    Strategy: definition lookup → FAQ exact/fuzzy → TF–IDF ranking with small boosts.
+
+    Args:
+        query (str): User query.
+        chunks (list[dict]): All chunks built by `build_corpus`.
+        vectorizer: Fitted TfidfVectorizer.
+        X: TF–IDF matrix.
+        top_k (int): Number of results to return.
+
+    Returns:
+        list[dict]: Top-ranked chunks (with `score` for TF–IDF phase).
+    """
     is_def, term = is_definition_query(query)
     if is_def:
         term_norm = normalize_text(term)
@@ -318,7 +396,19 @@ def retrieve(query: str, chunks: List[Dict], vectorizer, X, top_k: int = 5) -> L
     return [{**chunks[i], "score": float(sims[i])} for i in top_idx]
 
 def synthesize_answer(query: str, hits: List[Dict]) -> str:
-    """Concise answer; glossary returns definition, otherwise lead + bullets."""
+    """
+    Compose a concise answer from retrieved chunks.
+
+    - Glossary hit → short definition
+    - Otherwise → brief lead + bulletized key points (max ~150 words)
+
+    Args:
+        query (str): Original user query (unused in composition, for context).
+        hits (list[dict]): Retrieved chunks.
+
+    Returns:
+        str: Markdown-formatted answer.
+    """
     if not hits:
         return ("I couldn't find this in the project documentation yet. "
                 "If it's important, we should add it to the Methodology or Glossary.")
@@ -357,7 +447,15 @@ def synthesize_answer(query: str, hits: List[Dict]) -> str:
             "I only answer from the local project docs.*")
 
 def citation_line(hits: List[Dict]) -> str:
-    """Nice inline citation line for top sources."""
+    """
+    Format a compact citation line for the top sources.
+
+    Args:
+        hits (list[dict]): Retrieved chunks.
+
+    Returns:
+        str: Markdown string like "Sources: Title (file); ..." or empty string.
+    """
     if not hits:
         return ""
     items = []

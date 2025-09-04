@@ -1,3 +1,16 @@
+"""
+Home.py
+
+Streamlit entry page for the Berlin Housing Affordability app.
+
+This page serves as the landing page and provides:
+- Hero section with project title and author credit
+- Navigation buttons to the Recommender, Subdistrict Profiles, and Census dashboard
+- Highlights with key Berlin statistics
+- Explanations of how to use the app with supporting images
+- Sections for Data Sources, Tools, and Image credits
+"""
+
 # Imports
 import streamlit as st
 import os

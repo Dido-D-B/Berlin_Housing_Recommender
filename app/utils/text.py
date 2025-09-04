@@ -1,3 +1,15 @@
+"""
+text.py
+
+Text and string normalization utilities for the Berlin Housing Affordability app.
+
+This module provides helpers for:
+- Normalizing German names (handling dashes, umlauts, ß)
+- Creating safe filename slugs
+- Restoring human-readable German capitalization
+- Cleaning and formatting text for Q&A/glossary
+"""
+
 # Imports
 import re
 import string
@@ -8,6 +20,20 @@ _DASHES = "\u2013\u2014\u2012\u2212\u2010\u2011"  # en/em/figure/minus/hyphen va
 
 # Normalize strings for consistent comparison (dashes, umlauts, ß, whitespace).
 def norm(s: str):
+    """
+    Normalize a string for consistent comparison.
+
+    - Converts dash variants to "-"
+    - Normalizes umlauts and ß
+    - Strips and lowers case
+    - Collapses multiple spaces
+
+    Args:
+        s (str): Input string.
+
+    Returns:
+        str: Normalized string.
+    """
     if not isinstance(s, str):
         s = str(s) if s is not None else ""
     # unify dashes to ASCII '-'
@@ -26,7 +52,19 @@ def norm(s: str):
 
 # Normalize strings into safe filename bases (lowercase, replace spaces/underscores, transliterate umlauts).
 def normalize_filename_base(s: str) -> str:
-    """Apply the same normalization as _norm, plus turn spaces/underscores to '-'."""
+    """
+    Normalize a string into a safe filename base.
+
+    - Applies dash/unicode normalization like `norm`
+    - Converts spaces/underscores to "-"
+    - Lowercases
+
+    Args:
+        s (str): Input string.
+
+    Returns:
+        str: Normalized filename-safe base.
+    """
     if not isinstance(s, str):
         s = str(s) if s is not None else ""
     # unify dashes
@@ -44,8 +82,17 @@ def normalize_filename_base(s: str) -> str:
 
 # Convert district names into slugs suitable for filenames (Tempelhof-Schöneberg → tempelhof-schoeneberg).
 def district_slug(name: str) -> str:
-    """Normalize a district name to a filename-friendly slug used by images.
-    Example: "Tempelhof‑Schöneberg" -> "tempelhof-schoeneberg".
+    """
+    Convert a district name to a filename-friendly slug.
+
+    Example:
+        "Tempelhof-Schöneberg" → "tempelhof-schoeneberg"
+
+    Args:
+        name (str): District name.
+
+    Returns:
+        str: Slugified district string.
     """
     s = norm(name)
     s = s.replace(" ", "-")  # spaces to dashes
@@ -54,9 +101,17 @@ def district_slug(name: str) -> str:
 # Restore human-friendly German capitalization and common umlauts in names.
 def de_pretty(s: str) -> str:
     """
-    Return a human-friendly German-capitalized name (restores ä/ö/ü/ß where common
-    transliterations appear and applies Title-Case across hyphenated and spaced tokens).
-    Safe for already-correct strings.
+    Restore human-friendly German capitalization and umlauts.
+
+    - Capitalizes tokens in hyphenated/space-separated names
+    - Replaces transliterations (ae→ä, oe→ö, ue→ü, ss→ß)
+    - Safe for already correct strings
+
+    Args:
+        s (str): Input string.
+
+    Returns:
+        str: Human-friendly German name.
     """
     if not isinstance(s, str):
         return ""
@@ -76,12 +131,37 @@ def de_pretty(s: str) -> str:
 #
 
 def normalize_text(s: str) -> str:
-    """Lowercase and strip punctuation/whitespace to normalize user queries and titles."""
+    """
+    Normalize text for query matching.
+
+    - Lowercases
+    - Removes punctuation
+    - Strips whitespace
+
+    Args:
+        s (str): Input string.
+
+    Returns:
+        str: Normalized text.
+    """
     s = s.lower()
     return s.translate(str.maketrans('', '', string.punctuation)).strip()
 
 def is_definition_query(q: str) -> Tuple[bool, str]:
-    """Return (True, term) if the query looks like 'What is X?'/ 'Define X' / 'Meaning of X'."""
+    """
+    Detect if a query asks for a definition.
+
+    Matches patterns like:
+    - "What is X?"
+    - "Define X"
+    - "Meaning of X"
+
+    Args:
+        q (str): User query.
+
+    Returns:
+        tuple[bool, str]: (True, term) if definition query, else (False, "").
+    """
     q_norm = normalize_text(q)
     patterns = [
         r"^what is (.+)$",
@@ -95,16 +175,44 @@ def is_definition_query(q: str) -> Tuple[bool, str]:
     return False, ""
 
 def _clean_markdown(s: str) -> str:
-    """Remove markdown headings and collapse extra whitespace, keeping paragraphs intact."""
+    """
+    Clean markdown text for display.
+
+    - Removes heading lines
+    - Collapses excess blank lines
+
+    Args:
+        s (str): Markdown string.
+
+    Returns:
+        str: Cleaned markdown string.
+    """
     s = re.sub(r"^#{1,6}\s+.*$", "", s, flags=re.MULTILINE)
     s = re.sub(r"\n{3,}", "\n\n", s)
     return s.strip()
 
 def _as_bullets(text: str, max_bullets: int = 4) -> str:
-    """Format first sentence as lead + up to N bullet points from remaining sentences."""
+    """
+    Format text as a lead sentence with bullet points.
+
+    Args:
+        text (str): Input text.
+        max_bullets (int): Maximum number of bullet points.
+
+    Returns:
+        str: Formatted text with lead and bullets.
+    """
     sentences = re.split(r"(?<=[.!?])\s+", text.strip())
     if not sentences:
         return text
     lead = sentences[0].strip()
     bullets = [f"- {s.strip()}" for s in sentences[1:1+max_bullets] if s.strip()]
     return lead + ("\n\n" + "\n".join(bullets) if bullets else "")
+
+# Helper: prettify names with German umlauts and title case
+def format_german_title(name: str) -> str:
+    if not isinstance(name, str):
+        return str(name)
+    s = name.replace("ae", "ä").replace("oe", "ö").replace("ue", "ü")
+    s = s.replace("Ae", "Ä").replace("Oe", "Ö").replace("Ue", "Ü")
+    return s.title()

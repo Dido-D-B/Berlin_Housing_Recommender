@@ -1,3 +1,15 @@
+"""
+ui.py
+
+UI helpers for the Streamlit app: navigation, responsive CSS, tables, and small widgets.
+
+This module centralizes reusable UI pieces so pages stay lean and consistent:
+- Footer and safe page switching
+- Mobile-friendly CSS injector
+- Builders for the subdistrict profiles and recommendations tables
+- Small UI widgets such as the cluster legend and centered images
+"""
+
 # Imports
 import streamlit as st
 import streamlit.components.v1 as components
@@ -8,6 +20,7 @@ from utils.format import fmt_eur, fmt_int
 
 # Reusable footer function
 def render_footer():
+    """Render a small centered footer with author credit and a disclaimer."""
     st.markdown(
         """
         <div style="text-align: center; margin-top: 2em; font-size: 0.9em; color: gray;">
@@ -21,6 +34,12 @@ def render_footer():
 
 # Helper for safe navigation that won't crash if the page isn't present
 def safe_switch(target: str):
+    """
+    Attempt to switch to another Streamlit page; fall back to an info note if unavailable.
+
+    Args:
+        target (str): The page path passed to `st.switch_page`.
+    """
     try:
         st.switch_page(target)
     except Exception:
@@ -31,6 +50,16 @@ def safe_switch(target: str):
 
 # Create subdistrict profile table
 def build_profiles_table(df: pd.DataFrame, cluster_labels: dict) -> pd.DataFrame:
+    """
+    Build a tidy profiles table with pretty German names, cluster labels, and key POI columns.
+
+    Args:
+        df (pd.DataFrame): Source DataFrame with columns like bezirk/ortsteil and POIs.
+        cluster_labels (dict): Mapping from cluster id → human-readable label.
+
+    Returns:
+        pd.DataFrame: Cleaned, renamed, and lightly formatted table for display.
+    """
     display_df = df.copy()
     def _de_pretty(s: str) -> str:
         if not isinstance(s, str):
@@ -92,28 +121,17 @@ def render_subdistrict_reco_table(
     cluster_col: str = "k4_cluster",
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Render a clean subdistrict recommendation table and return (edited_df, selected_rows).
+    Render a subdistrict recommendation table with a selectable "Select" checkbox.
 
-    Expects columns (if present): 
-      - 'bezirk', 'ortsteil'
-      - numeric: 'aff_est_monthly_rent', 'aff_rent_per_m2', 'aff_rent_to_income' (0..1)
-      - cluster id column (default 'k4_cluster')
+    Expects (if present): bezirk/ortsteil, affordability metrics, and a cluster id column.
 
-    Parameters
-    ----------
-    df : DataFrame
-        Source results (will be copied).
-    cluster_labels : dict[int,str] | None
-        Mapping from cluster id -> human label (e.g., {0:'Balanced', ...}).
-    cluster_col : str
-        Name of the numeric cluster column in df.
+    Args:
+        df (pd.DataFrame): Source results (copied internally).
+        cluster_labels (dict[int,str] | None): Optional id → label mapping.
+        cluster_col (str): Name of the numeric cluster column.
 
-    Returns
-    -------
-    edited_df : DataFrame
-        The DataFrame as shown in the editor (including the 'Select' column).
-    selected_rows : DataFrame
-        Filter of rows where 'Select' is True (empty if none).
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame]: (edited_df, selected_rows)
     """
     work = df.copy()
 
@@ -198,6 +216,9 @@ def render_subdistrict_reco_table(
 
 # CSS helper mobile friendly
 def inject_responsive_css():
+    """
+    Inject responsive, mobile-friendly CSS (stack columns, full-width buttons, fluid images).
+    """
     import streamlit as st
     st.markdown("""
     <style>

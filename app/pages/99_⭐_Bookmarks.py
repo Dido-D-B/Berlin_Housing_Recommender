@@ -1,13 +1,26 @@
-# Imports
-import os, sys
-import streamlit as st
-from utils.bookmarks import list_bookmarks, remove_bookmark, clear_bookmarks, to_json
-from utils.ui import render_footer, inject_responsive_css
+"""
+99_⭐_Bookmarks.py
+
+Streamlit page for managing bookmarked Berlin subdistricts.
+
+This page:
+- Displays all saved bookmarks from session state
+- Provides a simple table with district, subdistrict, cluster, and estimated rent
+- Allows users to remove individual bookmarks
+- Provides a button to clear all bookmarks
+- Enables exporting all bookmarks as JSON
+"""
 
 # Ensure project root is importable
+import os, sys
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
+# Imports
+import streamlit as st
+from utils.bookmarks import list_bookmarks, remove_bookmark, clear_bookmarks, to_json
+from utils.ui import render_footer, inject_responsive_css
 
 # Page Configurations
 st.set_page_config(
@@ -29,6 +42,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Bookmark list
 rows = list_bookmarks()
 st.caption(f"You have **{len(rows)}** bookmarked subdistrict(s).")
 

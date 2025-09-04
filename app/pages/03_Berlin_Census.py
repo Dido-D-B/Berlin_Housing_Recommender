@@ -1,13 +1,25 @@
-# Imports
-import os, sys
-import streamlit as st
-from streamlit.components.v1 import html
-from utils.ui import render_footer, inject_responsive_css
+"""
+03_Berlin_Census.py
+
+Streamlit page for exploring Berlin’s Census 2022 data.
+
+This page:
+- Displays a landing header with project title and author credit
+- Provides a dropdown selector for different Tableau dashboards
+- Embeds Tableau Public dashboards in a responsive iframe
+- Covers topics such as demographics, income, employment, households, housing, and energy
+"""
 
 # Ensure project root is importable
+import os, sys
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
+# Imports
+import streamlit as st
+from streamlit.components.v1 import html
+from utils.ui import render_footer, inject_responsive_css
 
 # Page Configurations
 icon_path = os.path.join(PROJECT_ROOT, "app", "images", "icon.png")

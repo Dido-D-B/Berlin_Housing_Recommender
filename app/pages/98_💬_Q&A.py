@@ -1,14 +1,26 @@
-# Imports
-import os
-import sys
-import pathlib
-import streamlit as st
+"""
+98_💬_Q&A.py
+
+Streamlit page providing an interactive Q&A assistant for the Berlin Housing Affordability project.
+
+This page:
+- Loads local project documentation (`docs/`) into a TF–IDF corpus
+- Lets users ask free-text questions via a chat interface
+- Retrieves and synthesizes answers from glossary, FAQ, and methodology docs
+- Displays responses with optional expandable source citations
+- Includes an "About this assistant" section to explain scope and limitations
+"""
 
 # Ensure the *repository root* (the parent of the `app/` folder) is on sys.path so `import app...` works
+import os, sys
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]  # .../Berlin_Housing_Affordability
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+# Imports
+import pathlib
+import streamlit as st
+from utils.ui import inject_responsive_css, render_footer
 from app.utils.content import build_corpus, retrieve, synthesize_answer, citation_line
 
 # Page Configurations
@@ -21,6 +33,9 @@ st.set_page_config(
     page_title="Berlin Housing - Q&A",
     page_icon="💬",
     layout="wide")    
+
+# CSS
+inject_responsive_css()
 
 # UI
 st.markdown(
@@ -37,14 +52,16 @@ st.markdown("""**Ask your questions!** - The project assistant can answer (most 
 st.caption("Ask in natural language; multiple phrasings work. For definitions, start with “What is …” (e.g. What is Mietspiegel?).")
 st.divider()
 
+# About section
 with st.expander("About this assistant", expanded=False):
     st.markdown(
         "- **Purpose:** This assistant helps you navigate and understand the Berlin Housing Affordability project.  \n"
         "- **Scope:** It can explain glossary terms, methods, preprocessing, cultural facts, images, dashboards, and recommendations documented in your `./docs`.  \n"
         "- **Sources:** Answers are built only from local project files (`faq.md`, `glossary.md`, `methodology.md`, etc.).  \n"
-        "- **Limitations:** If something isn’t documented, the assistant will tell you. Add it to the docs and it becomes available automatically.  \n"
+        "- **Limitations:** If something isn’t documented, the assistant will tell you. \n"
     )
 
+# Corpus
 chunks, vectorizer, X = build_corpus(DOCS_DIR)
 
 if not chunks:
@@ -77,3 +94,5 @@ for entry in st.session_state.history:
                     st.caption(entry[2])
 
 st.divider()
+
+render_footer()

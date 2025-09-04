@@ -1,0 +1,31 @@
+# .streamlit/config.toml
+
+[theme]
+primaryColor = "#A50034"            # Berlin Red
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F5F5F5"
+textColor = "#111111"
+font = "sans serif"
+
+[server]
+headless = true
+enableXsrfProtection = true
+enableCORS = false
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = true
+
+[runner]
+magicEnabled = false
+fastReruns = true
+
+[global]
+# Faster tables & cross‑platform consistency
+dataFrameSerialization = "arrow"
+
+[logger]
+level = "info"

@@ -1,3 +1,16 @@
+"""
+geo.py (utils)
+
+Utilities for geographic data in the Streamlit app layer.
+
+This module provides helpers to:
+- Find district images by normalized filenames (handles umlauts/dashes/case)
+- Detect latitude/longitude column names in DataFrames
+- Pick a human-readable feature name from GeoJSON properties
+- Resolve common locations of the Ortsteil boundary GeoJSON
+- Add cluster-based colors to GeoJSON features for deck.gl layers
+"""
+
 # Imports
 import os
 import pandas as pd
@@ -12,19 +25,19 @@ IMAGES_DIR = os.environ.get("DISTRICT_IMAGES_DIR", _IMAGES_DIR_DEFAULT)
 
 # Locate up to N district images by normalizing filenames (handles umlauts/dashes/case).
 def find_district_images(bezirk: str, max_n: int = 4, images_dir: str | None = None) -> List[str]:
-    """Return up to max_n image paths for a district by *normalizing* filenames.
+    """
+    Return up to `max_n` image file paths for a district by normalizing filenames.
 
-    We match files like 'Charlottenburg–Wilmersdorf1.jpeg' (en‑dash) and
-    'charlottenburg-wilmersdorf1.jpg' alike by normalizing the root name.
+    Matches files like "Charlottenburg–Wilmersdorf1.jpeg" and
+    "charlottenburg-wilmersdorf1.jpg" via a normalized root name.
 
-    Parameters
-    ----------
-    bezirk : str
-        District name (e.g., "Charlottenburg-Wilmersdorf").
-    max_n : int
-        Maximum number of images to return, in order 1..max_n.
-    images_dir : Optional[str]
-        Directory to search. Defaults to IMAGES_DIR (env override supported).
+    Args:
+        bezirk (str): District name (e.g., "Charlottenburg-Wilmersdorf").
+        max_n (int): Maximum number of images to return, in order 1..max_n.
+        images_dir (str | None): Directory to search; defaults to `IMAGES_DIR`.
+
+    Returns:
+        list[str]: Image paths found in slot order (1..max_n), missing slots skipped.
     """
     if not bezirk:
         return []
@@ -52,12 +65,21 @@ def find_district_images(bezirk: str, max_n: int = 4, images_dir: str | None = N
     # Return only discovered files, in order
     return [p for p in found if p]
 
-# Candidate column names we consider when auto-detecting coordinates.
+# Candidate column names considered when auto-detecting coordinates.
 POSSIBLE_LAT = ["lat", "latitude", "y", "Lat"]
 POSSIBLE_LON = ["lon", "longitude", "x", "Lon", "lng", "Lng"]
 
 # Heuristically detect latitude/longitude column names in a dataframe.
 def find_coords_columns(df: pd.DataFrame):
+    """
+    Heuristically detect latitude/longitude column names in a DataFrame.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame.
+
+    Returns:
+        tuple[str | None, str | None]: (lat_col, lon_col) if detected, else (None, None).
+    """
     lat_col, lon_col = None, None
     for c in POSSIBLE_LAT:
         if c in df.columns:
@@ -71,6 +93,17 @@ def find_coords_columns(df: pd.DataFrame):
 
 # Pick a human-readable feature name from GeoJSON properties using common keys.
 def pick_feature_name(props: dict) -> str:
+    """
+    Pick a human-readable feature name from GeoJSON properties.
+
+    Tries common keys (e.g., 'ortsteil', 'Ortsteil', 'name', 'spatial_alias', 'bez_name').
+
+    Args:
+        props (dict): Feature properties.
+
+    Returns:
+        str: The found name or an empty string.
+    """
     for k in ("ortsteil", "OTEIL", "Ortsteil", "name", "spatial_alias", "bez_name"):
         if k in props and props[k]:
             return str(props[k])
@@ -78,6 +111,15 @@ def pick_feature_name(props: dict) -> str:
 
 # Resolve the Ortsteil GeoJSON path by checking a few common project locations.
 def resolve_ortsteil_geojson(project_root: str) -> str|None:
+    """
+    Resolve the Ortsteil GeoJSON path by checking common project locations.
+
+    Args:
+        project_root (str): Absolute path to the repository root.
+
+    Returns:
+        str | None: Path to the GeoJSON if found; otherwise None.
+    """
     candidates = [
         os.path.join(project_root, "data", "berlin_ortsteil_boundaries.geojson"),
         os.path.join(project_root, "data", "processed", "berlin_ortsteil_boundaries.geojson"),
@@ -87,6 +129,20 @@ def resolve_ortsteil_geojson(project_root: str) -> str|None:
 
 # Add cluster color/style info to each GeoJSON feature (used by deck.gl layer).
 def colorize_geojson_by_cluster(geojson_fc: dict, ortsteil_to_cluster: dict, palette: dict) -> dict:
+    """
+    Add per-feature fill colors and cluster IDs to a GeoJSON FeatureCollection.
+
+    Uses `ortsteil_to_cluster` (keyed by normalized name) to look up cluster ID and applies
+    a color from `palette`. Appends an alpha channel (80) for translucent fills.
+
+    Args:
+        geojson_fc (dict): Input FeatureCollection GeoJSON.
+        ortsteil_to_cluster (dict): Mapping of normalized names → cluster ID.
+        palette (dict): Mapping of cluster ID → [r, g, b].
+
+    Returns:
+        dict: A new FeatureCollection with enriched feature properties.
+    """
     fc = {"type": "FeatureCollection", "features": []}
     for ft in geojson_fc.get("features", []):
         props = dict(ft.get("properties", {}) or {})

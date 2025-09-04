@@ -1,3 +1,15 @@
+"""
+data.py
+
+Utility functions for loading and preparing the master dataset
+for exploration in the Berlin Housing Affordability app.
+
+This module:
+- Provides a safe JSON loader
+- Loads the master DataFrame with selected columns
+- Resolves coordinates and geojson path for subdistricts
+"""
+
 # Import
 import json
 import os
@@ -13,6 +25,15 @@ if PROJECT_ROOT not in sys.path:
 
 # load JSON safely
 def load_json(path: str):
+    """
+    Load a JSON file safely.
+
+    Args:
+        path (str): Path to JSON file.
+
+    Returns:
+        dict: Parsed JSON object, or {} if loading fails.
+    """
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -21,6 +42,16 @@ def load_json(path: str):
 
 @st.cache_data(show_spinner=False)    
 def _load():
+    """
+    Load the master dataset with selected columns and geo information.
+
+    - Keeps only core columns needed for exploration
+    - Adds population and coordinate columns if present
+    - Resolves the path to the subdistrict GeoJSON file
+
+    Returns:
+        tuple: (DataFrame, lat_col, lon_col, geo_path)
+    """
     df = load_master()
     pop_col = "total_population" if "total_population" in df.columns else None
     # Keep only columns we need for exploration
@@ -40,4 +71,4 @@ def _load():
     # resolve geojson path via helper
     geo_path = resolve_ortsteil_geojson(PROJECT_ROOT)
 
-    return df[use_cols].copy(), lat_col, lon_col, geo_path    
+    return df[use_cols].copy(), lat_col, lon_col, geo_path   

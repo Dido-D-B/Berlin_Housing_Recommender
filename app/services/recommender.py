@@ -16,6 +16,7 @@ from berlin_housing import add_affordability, top_recommendations
 from berlin_housing.config import (
     DEFAULT_MIETSPIEGEL_COL, DEFAULT_INCOME_COL, DEFAULT_CLUSTER_COL
 )
+from utils.constants import HOUSEHOLD_M2
 
 # Get top k recommended subdistricts
 def get_top_k(
@@ -64,3 +65,17 @@ def get_top_k(
         relax_thresholds=relax_thresholds,
     )
     return top
+
+# Estimate required apartment size
+def estimate_required_sqm(hh_type: str, *, children: int = 0, wg_people: int = 3) -> int:
+    if hh_type == "Single":
+        return HOUSEHOLD_M2["Single"]
+    if hh_type == "Couple":
+        return HOUSEHOLD_M2["Couple"]
+    if hh_type == "Family":
+        return HOUSEHOLD_M2["Family"]["base"] + children * HOUSEHOLD_M2["Family"]["per_child"]
+    if hh_type == "WG":
+        return wg_people * HOUSEHOLD_M2["WG"]["per_person"]
+    if hh_type == "Senior":
+        return HOUSEHOLD_M2["Senior"]
+    return HOUSEHOLD_M2["Single"]

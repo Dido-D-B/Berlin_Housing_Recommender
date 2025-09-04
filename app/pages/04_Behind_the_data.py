@@ -1,14 +1,27 @@
-# Imports
-import streamlit as st
-import os, sys
-import io, base64
-from PIL import Image
-from utils.ui import inject_responsive_css, render_cluster_legend, render_footer
+"""
+04_Behind_the_data.py
+
+Streamlit page explaining the methodology and analysis behind the Berlin Housing Affordability app.
+
+This page:
+- Summarizes key insights from exploratory data analysis (EDA)
+- Shows how affordability gaps were identified
+- Explains the KMeans clustering process and optimal k selection
+- Demonstrates how clusters were interpreted and mapped to lifestyle profiles
+- Provides feature and amenity comparisons across clusters
+"""
 
 # Ensure project root is importable
+import os, sys
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
+# Imports
+import streamlit as st
+import io, base64
+from PIL import Image
+from utils.ui import inject_responsive_css, render_cluster_legend, render_footer
 
 # Page configurations
 icon_path = os.path.join(PROJECT_ROOT, "app", "images", "icon.png")
@@ -17,6 +30,7 @@ st.set_page_config(
     page_icon=icon_path,
     layout="wide",
 )
+
 # CSS
 inject_responsive_css()
 
@@ -251,5 +265,7 @@ st.markdown(
     f"<div style='text-align:center;'><img src='data:image/png;base64,{b64}' title='{amenity_caption}'/></div>",
     unsafe_allow_html=True
 )
+
 st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+
 render_footer()

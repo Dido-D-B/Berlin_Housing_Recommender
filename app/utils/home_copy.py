@@ -1,3 +1,22 @@
+"""
+home_copy.py
+
+Centralized descriptive text for the Berlin Housing Affordability app.
+
+This module stores copy (Markdown-formatted strings) for each app section:
+- Recommender
+- Subdistrict Profiles
+- Census
+- Data/Behind the Data
+- Bookmarks
+- Data Sources
+- Tools
+- Images
+
+The copy is imported into the Streamlit Home page to keep descriptive content
+separate from logic and layout code.
+"""
+
 HOME_COPY = {
     "recommender": """
         * Provide your **net income** with an **affordability threshold** (e.g. 30–40%), desired subdistrict profiles (Balanced, Vibrant, Affordable, and Prestige), and other preferences.  
