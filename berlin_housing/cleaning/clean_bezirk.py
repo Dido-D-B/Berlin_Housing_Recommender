@@ -1,3 +1,9 @@
+"""
+This module contains cleaning and enrichment functions for Bezirk (district-level) datasets
+in the Berlin Housing project. It provides utilities for standardization, type coercion,
+deduplication, and merging of multiple district-level data sources into master tables.
+"""
+
 # Imports
 import pandas as pd
 from __future__ import annotations
@@ -13,9 +19,13 @@ from .clean_shared import (
 # Utility: ensure uniqueness by Bezirk
 def _ensure_unique_by_bezirk(df: pd.DataFrame, name: str) -> pd.DataFrame:
     """
-    Guarantee one row per 'bezirk'.
-    - numeric columns -> sum
-    - non-numeric    -> first
+    Ensures that the DataFrame has only one row per 'bezirk' by aggregating duplicate rows.
+    Sums numeric columns and takes the first value for non-numeric columns.
+    Args:
+        df: Input DataFrame with a 'bezirk' column.
+        name: Name of the dataset (for logging/debugging, unused).
+    Returns:
+        DataFrame with unique 'bezirk' values as rows.
     """
     if "bezirk" not in df.columns or df.empty:
         return df
@@ -36,13 +46,12 @@ def _ensure_unique_by_bezirk(df: pd.DataFrame, name: str) -> pd.DataFrame:
 # Core Bezirk table cleaner
 def clean_bezirk_tables(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Clean Bezirk-level table.
-
-    Actions:
-      - standardize/rename bezirk column to `bezirk`
-      - coerce numerical indicators (leave as-is; only ensure `bezirk` is str)
-      - build `bezirk_norm` for joins
-      - ensure one row per bezirk
+    Cleans a Bezirk-level table by standardizing the 'bezirk' column, coercing types,
+    creating a normalized column for joins, and ensuring one row per bezirk.
+    Args:
+        df: Input DataFrame with district-level data.
+    Returns:
+        Cleaned DataFrame with standardized columns and unique rows per bezirk.
     """
     df1 = standardize_columns(df)
     if "bezirk" not in df1.columns:
@@ -58,6 +67,13 @@ def clean_bezirk_tables(df: pd.DataFrame) -> pd.DataFrame:
 
 # District enrichment table cleaners (bridges, cinemas, libraries, cars, toilets, tourism, trees, census slice)
 def clean_bridges_df(df_bridges: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans the bridges dataset at the district level by renaming columns and standardizing 'bezirk' values.
+    Args:
+        df_bridges: DataFrame containing bridges data per district.
+    Returns:
+        Cleaned DataFrame with standardized columns for bridges.
+    """
     df = df_bridges.copy()
     df = df.rename(columns={
         "Bezirk": "bezirk",
@@ -70,6 +86,14 @@ def clean_bridges_df(df_bridges: pd.DataFrame) -> pd.DataFrame:
 
 # Clean cinemas dataset
 def clean_cinemas_df(df_cinemas: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans the cinemas dataset at the district level by renaming columns, standardizing 'bezirk',
+    and converting movie theater counts to integer.
+    Args:
+        df_cinemas: DataFrame containing cinema data per district.
+    Returns:
+        Cleaned DataFrame with standardized columns for cinemas.
+    """
     df = df_cinemas.copy()
     df = df.dropna(subset=["Bezirk"]).rename(columns={
         "Bezirk": "bezirk",
@@ -81,6 +105,14 @@ def clean_cinemas_df(df_cinemas: pd.DataFrame) -> pd.DataFrame:
 
 # Clean libraries dataset
 def clean_libraries_df(df_libraries: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans the libraries dataset at the district level by renaming columns, standardizing 'bezirk',
+    and converting visits and borrowings to integer.
+    Args:
+        df_libraries: DataFrame containing library data per district.
+    Returns:
+        Cleaned DataFrame with standardized columns for libraries.
+    """
     df = df_libraries.copy()
     df = df.rename(columns={
         "Bezirk": "bezirk",
@@ -99,6 +131,14 @@ def clean_libraries_df(df_libraries: pd.DataFrame) -> pd.DataFrame:
 
 # Clean cars dataset
 def clean_cars_df(df_cars: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans the cars dataset at the district level by renaming columns, standardizing 'bezirk',
+    and converting car counts and rates to numeric types.
+    Args:
+        df_cars: DataFrame containing car data per district.
+    Returns:
+        Cleaned DataFrame with standardized columns for cars.
+    """
     df = df_cars.copy().rename(columns={
         "Bezirk": "bezirk",
         "Total": "district_total_cars",
@@ -115,6 +155,13 @@ def clean_cars_df(df_cars: pd.DataFrame) -> pd.DataFrame:
 
 # Aggregate toilets dataset
 def aggregate_toilets_df(df_toilets: pd.DataFrame) -> pd.DataFrame:
+    """
+    Aggregates the toilets dataset by counting the number of public toilets per district.
+    Args:
+        df_toilets: DataFrame containing public toilet locations with 'Bezirk' and 'ID'.
+    Returns:
+        DataFrame with 'bezirk' and count of public toilets per district.
+    """
     df = (
         df_toilets.groupby("Bezirk").agg(district_public_toilets=("ID", "count")).reset_index()
         .rename(columns={"Bezirk": "bezirk"})
@@ -124,6 +171,14 @@ def aggregate_toilets_df(df_toilets: pd.DataFrame) -> pd.DataFrame:
 
 # Clean overnight stays dataset
 def clean_overnight_stays_df(df_overnight_stays: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans the overnight stays tourism dataset by renaming columns, standardizing 'bezirk',
+    and converting overnight stay counts and changes to integer.
+    Args:
+        df_overnight_stays: DataFrame with overnight stays data per district.
+    Returns:
+        Cleaned DataFrame with standardized columns for tourism overnight stays.
+    """
     df = df_overnight_stays.copy().rename(columns={
         "Bezirke": "bezirk",
         "overnight stays": "district_tourism_overnightstays_2024",
@@ -140,6 +195,14 @@ def clean_overnight_stays_df(df_overnight_stays: pd.DataFrame) -> pd.DataFrame:
 
 # Clean guests dataset
 def clean_guests_df(df_guests: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans the guests tourism dataset by filtering for the most recent year, renaming columns,
+    standardizing 'bezirk', and converting guest counts to integer.
+    Args:
+        df_guests: DataFrame with guest data per district, possibly with multiple years.
+    Returns:
+        Cleaned DataFrame with standardized columns for tourism guests.
+    """
     df = df_guests.copy()
 
     # If Year exists, prefer 2024, else max-year; otherwise skip the filter
@@ -171,6 +234,14 @@ def clean_guests_df(df_guests: pd.DataFrame) -> pd.DataFrame:
 
 # Clean trees dataset
 def clean_trees_df(df_trees: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans the street trees dataset at the district level by renaming columns, standardizing 'bezirk',
+    and converting tree counts to integer.
+    Args:
+        df_trees: DataFrame containing street tree data per district.
+    Returns:
+        Cleaned DataFrame with standardized columns for street trees.
+    """
     df = df_trees.copy().rename(columns={
         "Bezirk": "bezirk",
         "Street\ntrees\ntotal": "district_street_trees",
@@ -181,6 +252,14 @@ def clean_trees_df(df_trees: pd.DataFrame) -> pd.DataFrame:
 
 # Clean census data
 def clean_census_district_df(df_census: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans and standardizes the census dataset at the district level by renaming columns,
+    dropping irrelevant columns, coercing all values to numeric, and aggregating by district.
+    Args:
+        df_census: DataFrame containing census data per district.
+    Returns:
+        Cleaned and aggregated DataFrame with standardized columns for census data.
+    """
     df = df_census.copy().rename(columns={
         "district": "bezirk",
         "central_heating_percentage": "district_central_heating_percentage",
@@ -310,7 +389,22 @@ def build_bezirk_enrichment(
     trees: pd.DataFrame,
     census: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Merge all district-level enrichment sources into a single master table (join order mirrors notebook)."""
+    """
+    Merges all cleaned district-level enrichment sources into a single master DataFrame.
+    The join order mirrors the notebook structure.
+    Args:
+        bridges: Cleaned bridges DataFrame.
+        cinemas: Cleaned cinemas DataFrame.
+        libraries: Cleaned libraries DataFrame.
+        cars: Cleaned cars DataFrame.
+        toilets: Cleaned toilets DataFrame.
+        overnight_stays: Cleaned overnight stays DataFrame.
+        guests: Cleaned guests DataFrame.
+        trees: Cleaned street trees DataFrame.
+        census: Cleaned census DataFrame.
+    Returns:
+        Master DataFrame with all enrichment columns joined on 'bezirk'.
+    """
     b  = _ensure_unique_by_bezirk(clean_bridges_df(bridges), "bridges")
     c  = _ensure_unique_by_bezirk(clean_cinemas_df(cinemas), "cinemas")
     l  = _ensure_unique_by_bezirk(clean_libraries_df(libraries), "libraries")
@@ -344,7 +438,16 @@ def build_bezirk_master_notebook_style(
     rent_m2: pd.DataFrame,
 ) -> pd.DataFrame:
     """
-    Aggregate multiple district-level datasets into a single master table (as in the notebook).
+    Aggregates multiple district-level datasets into a single master table, matching the style used in the notebook.
+    Args:
+        buildings: DataFrame with building data per district.
+        employment: DataFrame with employment data per district.
+        households: DataFrame with household data per district.
+        median_income: DataFrame with median income data per district.
+        population: DataFrame with population data per district.
+        rent_m2: DataFrame with rent data per district.
+    Returns:
+        Master DataFrame with all relevant columns joined on 'district'.
     """
     rent_agg = rent_m2.groupby("district").agg({
         "minRent": "mean","avgRent": "mean","maxRent": "mean","minBuy": "mean","avgBuy": "mean"

@@ -1,3 +1,7 @@
+"""This module provides functions to evaluate clustering results in the Berlin Housing project
+by creating cluster profile tables and scaling them for comparison."""
+
+# Imports
 import pandas as pd
 from __future__ import annotations
 from sklearn.preprocessing import MinMaxScaler

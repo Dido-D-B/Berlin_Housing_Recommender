@@ -1,9 +1,26 @@
+"""
+This module provides functions for generating housing recommendations by filtering,
+ranking, and applying fallback strategies based on affordability, clusters, and amenities
+in the Berlin Housing project.
+"""
+
+# Imports
 from __future__ import annotations
 import pandas as pd
 from typing import Iterable, Optional, Dict, Any
 
 # Compute ranking score from rent-to-income ratio with small amenity adjustments
 def _score_row(row: pd.Series) -> float:
+    """
+    Compute a ranking score for a housing option based on its rent-to-income ratio,
+    adjusted slightly by the presence of amenities.
+
+    Parameters:
+        row (pd.Series): A row from the DataFrame representing a housing option.
+
+    Returns:
+        float: The computed score where lower is better.
+    """
     ratio = float(row.get("aff_rent_to_income", 1.0))
     bonus = 0.0
     for col in ("cafes", "restaurants", "supermarket", "green_space"):
@@ -13,6 +30,16 @@ def _score_row(row: pd.Series) -> float:
 
 # Select a compact set of columns for the results table
 def _compact_columns(df: pd.DataFrame, cluster_col: str) -> list[str]:
+    """
+    Select a subset of columns to present in the final recommendations output.
+
+    Parameters:
+        df (pd.DataFrame): The DataFrame containing housing data.
+        cluster_col (str): The name of the cluster column.
+
+    Returns:
+        list[str]: A list of column names to include in the output.
+    """
     base_cols = [c for c in [
         "bezirk", "ortsteil", cluster_col,
         "aff_rent_per_m2", "aff_est_monthly_rent", "aff_rent_to_income"
@@ -36,17 +63,20 @@ def top_recommendations(
     relax_thresholds: Optional[Iterable[float]] = (0.32, 0.35, 0.40),
 ) -> pd.DataFrame:
     """
-    Filter -> rank -> Top‑k with graceful fallbacks.
+    Generate top-k housing recommendations by filtering and ranking with fallback options.
 
-    Order of attempts:
-      A) exact filters (affordable + preferred cluster)
-      B) if empty and relax_thresholds provided:
-           try same cluster(s) with progressively higher affordability
-           thresholds (uses aff_rent_to_income <= t)
-      C) if still empty and fallback_if_empty:
-           1) 'no_affordable_in_cluster'  -> ignore affordability, keep cluster(s)
-           2) 'affordable_other_clusters' -> keep affordability, drop cluster(s)
-           3) 'cheapest_overall'          -> ignore both
+    Parameters:
+        df_with_aff (pd.DataFrame): DataFrame containing housing data with affordability info.
+        preferred_clusters (Optional[Iterable[int]]): Clusters to prefer in filtering.
+        cluster_col (str): Column name for clusters.
+        only_affordable (bool): Whether to restrict to affordable options initially.
+        k (int): Number of top recommendations to return.
+        extra_filters (Optional[Dict[str, Any]]): Additional column-value filters to apply.
+        fallback_if_empty (bool): Whether to attempt fallback strategies if no results.
+        relax_thresholds (Optional[Iterable[float]]): Affordability thresholds to relax progressively.
+
+    Returns:
+        pd.DataFrame: Top-k recommendations with scores and notes about the filtering step.
     """
     df0 = df_with_aff.copy()
 

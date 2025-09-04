@@ -1,3 +1,15 @@
+"""Configuration file for the Berlin Housing project.
+
+This module centralizes constants and paths used throughout the project, including:
+  - Data directories and processed output locations
+  - Input dataset file paths for various Berlin datasets (e.g., bridges, cinemas, libraries, census)
+  - Scraper settings for Points of Interest (POIs), including boundaries and rate limits
+  - Output paths for processed and master datasets
+  - Default parameters for affordability calculations (e.g., default flat size, income threshold)
+
+By maintaining these configuration values in a single place, the project ensures consistent access to resources and simplifies updates to file locations or calculation defaults.
+"""
+
 import os
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

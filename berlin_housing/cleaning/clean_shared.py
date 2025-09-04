@@ -1,3 +1,12 @@
+"""
+This module provides shared cleaning utilities for the Berlin Housing project.
+It includes functions for:
+    - column normalization (e.g., snake_case conversion, renaming)
+    - dtype coercion for DataFrame columns (int, float, string)
+    - duplicate handling and uniqueness assertions
+    - consistent normalization of Bezirk and Ortsteil names to enable reliable joins across datasets
+"""
+
 # Imports
 import pandas as pd
 from __future__ import annotations

@@ -1,3 +1,5 @@
+"""This package provides POI (Points of Interest) utilities for the Berlin Housing project, re-exporting key functions for fetching, processing, and merging POI data."""
+
 from .poi import (
     default_tags,
     fetch_pois_for_polygon,

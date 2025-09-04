@@ -1,3 +1,5 @@
+"""This module provides data quality assurance utilities for the Berlin Housing project, including functions for missing value summaries, warnings for non-numeric columns, and unique value reports for object columns."""
+
 from __future__ import annotations
 import pandas as pd
 

@@ -1,3 +1,10 @@
+"""
+This module provides cleaning and building utilities for Ortsteil (subdistrict-level) datasets
+in the Berlin Housing project. It includes functions for census integration, population pivots,
+street lookup, rent/income aggregation, and final master table construction.
+"""
+
+# Imports
 import pandas as pd
 from __future__ import annotations
 from typing import List

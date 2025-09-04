@@ -1,3 +1,6 @@
+"""This module provides functions for mapping Mietspiegel classification values to estimated rent levels and for adding affordability metrics (rent per m², estimated monthly rent, rent-to-income ratio, and affordability label) to a DataFrame in the Berlin Housing project."""
+
+# Imports
 import numpy as np
 import pandas as pd
 from typing import Dict, Optional, Sequence

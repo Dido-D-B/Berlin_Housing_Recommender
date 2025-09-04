@@ -1,3 +1,6 @@
+"""This module defines the central default configuration for clustering tasks in the Berlin Housing project.
+It uses ClusteringConfig to specify input/output paths, ID column, PCA prefix, cluster count, and random state."""
+
 from pathlib import Path
 from ..model import ClusteringConfig
 

@@ -1,4 +1,6 @@
 """Assign clusters using a saved KMeans model to a PCA CSV (for app use)."""
+
+# Imports
 import pandas as pd
 import joblib
 from __future__ import annotations
@@ -11,6 +13,25 @@ def assign_clusters(
     model_path: Path = Path("../models/kmeans_k4.joblib"),
     cfg: ClusteringConfig = DEFAULT_CFG,
 ) -> pd.DataFrame:
+    """
+    Assign cluster labels to data points based on a saved KMeans model and a PCA-transformed dataset.
+
+    Parameters:
+    -----------
+    pca_csv : Path | None, optional
+        Path to the CSV file containing PCA-transformed data. If None, uses the default path from the config.
+    model_path : Path, optional
+        Path to the saved KMeans model file (joblib format). Defaults to '../models/kmeans_k4.joblib'.
+    cfg : ClusteringConfig, optional
+        Configuration object containing parameters such as PCA prefix, ID column name, and number of clusters.
+        Defaults to DEFAULT_CFG.
+
+    Returns:
+    --------
+    pd.DataFrame
+        A DataFrame containing the ID column and the assigned cluster labels with column name formatted as
+        'k{n_clusters}_cluster'.
+    """
     if pca_csv is None:
         pca_csv = cfg.pca_csv
     pca = pd.read_csv(pca_csv)

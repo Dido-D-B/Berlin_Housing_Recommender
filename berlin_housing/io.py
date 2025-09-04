@@ -1,3 +1,9 @@
+"""This module provides I/O utilities for the Berlin Housing project,
+including functions to load the master dataset from CSV and clean
+unnecessary index columns.
+"""
+
+# Imports
 import pandas as pd
 from .config import MASTER_CSV
 

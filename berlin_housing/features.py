@@ -1,3 +1,11 @@
+"""
+This module provides feature engineering utilities for the Berlin Housing project.
+It includes functions to extract age and POI-related columns, add sanity check columns,
+engineer derived features such as diversity metrics, densities, and ratios, and prepare
+final feature sets for modeling.
+"""
+
+# Imports
 from __future__ import annotations
 import pandas as pd
 import numpy as np

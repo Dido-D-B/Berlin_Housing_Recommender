@@ -1,3 +1,9 @@
+"""
+This module provides configurable cleaning utilities for Census 2022 data at the district or subdistrict (Ortsteil) levels.
+It uses a dataclass-based configuration to define column mappings and dtype coercions, enabling flexible cleaning of raw census tables.
+"""
+
+# Imports
 import pandas as pd
 from __future__ import annotations
 from dataclasses import dataclass

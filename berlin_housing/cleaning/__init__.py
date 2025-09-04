@@ -4,7 +4,7 @@
 Convenience imports for berlin_housing.cleaning.
 
 Usage:
-    from berlin_housing.cleaning import clean_census_2022, build_bezirk_enrichment, ...
+   from berlin_housing.cleaning import clean_census_2022, build_bezirk_enrichment, ...
 """
 
 # Import submodules as module objects for access to their __all__

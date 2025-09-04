@@ -1,3 +1,6 @@
+"""This module provides utilities for fetching, normalizing, aggregating, and merging POI (Points of Interest) data using OSM and GeoPandas for the Berlin Housing project."""
+
+# Imports
 import time
 import geopandas as gpd
 import pandas as pd
@@ -18,9 +21,15 @@ except Exception:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 FAILED_PATH = Path("artifacts/failed_ortsteile.txt")
 
-# 1) Config helpers
 # Provide default OSM tags for fetching POIs
 def default_tags() -> Dict[str, List[str]]:
+    """Return default OSM tags for fetching Points of Interest (POIs).
+
+    Returns
+    -------
+    Dict[str, List[str]]
+        A dictionary mapping OSM keys to lists of tag values to query.
+    """
     return {
         "shop": ["supermarket"],
         "amenity": [
@@ -41,7 +50,6 @@ GROUPED_COLUMNS = {
     "medical": ["clinic", "hospital", "pharmacy"],
 }
 
-# 2) Fetch
 # Fetch POIs for a single polygon with retry and backoff
 def fetch_pois_for_polygon(
     polygon: Polygon,
@@ -50,20 +58,25 @@ def fetch_pois_for_polygon(
     retries: int = 3,
     backoff_s: float = 2.0,
 ) -> gpd.GeoDataFrame:
-    """Fetch raw OSM features for a single polygon with simple retry/backoff.
+    """Fetch raw OSM features for a single polygon with retry and exponential backoff.
 
     Parameters
     ----------
     polygon : shapely.geometry.Polygon
         Boundary polygon to query.
-    tags : dict | None
-        OSM tags to request (defaults to `default_tags()`).
-    rate_limit_s : float
-        Sleep after a successful request to be polite to Overpass.
-    retries : int
-        Number of retry attempts on failure.
-    backoff_s : float
-        Base backoff seconds; actual wait grows exponentially per retry.
+    tags : dict | None, optional
+        OSM tags to request (defaults to `default_tags()`), by default None
+    rate_limit_s : float, optional
+        Seconds to sleep after a successful request to avoid rate limiting, by default 1.5
+    retries : int, optional
+        Number of retry attempts on failure, by default 3
+    backoff_s : float, optional
+        Base backoff seconds; wait time grows exponentially per retry, by default 2.0
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        GeoDataFrame containing fetched POI features.
     """
     tags = tags or default_tags()
 
@@ -105,10 +118,32 @@ def fetch_all_pois_by_ortsteil(
     backoff_s: float = 2.0,
     save_failed_path: Path = FAILED_PATH,
 ) -> gpd.GeoDataFrame:
-    """Loop boundaries and fetch; robust to failures; adds 'ortsteil' column.
+    """Fetch POIs for all Ortsteile polygons with progress and failure handling.
 
-    Shows a progress bar if `tqdm` is available. Writes failed names to
-    `save_failed_path` and logs a summary of successes/failures.
+    Iterates over each polygon in `boundaries`, fetches POIs using `fetch_pois_for_polygon`,
+    and aggregates results. Failed Ortsteile names are saved to a file.
+
+    Parameters
+    ----------
+    boundaries : geopandas.GeoDataFrame
+        GeoDataFrame containing Ortsteile polygons.
+    ortsteil_col : str, optional
+        Column name for Ortsteil names, by default "OTEIL"
+    tags : dict | None, optional
+        OSM tags to request (defaults to `default_tags()`), by default None
+    rate_limit_s : float, optional
+        Seconds to sleep after a successful request, by default 1.5
+    retries : int, optional
+        Number of retry attempts on failure, by default 3
+    backoff_s : float, optional
+        Base backoff seconds for exponential backoff, by default 2.0
+    save_failed_path : pathlib.Path, optional
+        Path to save failed Ortsteile names, by default FAILED_PATH
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        Aggregated GeoDataFrame of POIs with an added 'ortsteil' column.
     """
     tags = tags or default_tags()
     collected: list[gpd.GeoDataFrame] = []
@@ -156,7 +191,20 @@ def fetch_all_pois_by_ortsteil(
 # 3) Normalize
 # Add flattened tag columns (main_tag, tag_value) to GeoDataFrame
 def add_tag_columns(gdf: gpd.GeoDataFrame, tags: Dict[str, List[str]] | None = None) -> gpd.GeoDataFrame:
-    """Flatten OSM keys into main_tag and tag_value (your notebook logic)."""
+    """Add 'main_tag' and 'tag_value' columns by flattening OSM tag keys and values.
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        GeoDataFrame with raw OSM POI data.
+    tags : dict | None, optional
+        Dictionary of OSM keys to consider, by default None
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        Copy of input GeoDataFrame with added 'main_tag' and 'tag_value' columns.
+    """
     tags = tags or default_tags()
     g = gdf.copy()
     if g.empty:
@@ -180,7 +228,18 @@ def add_tag_columns(gdf: gpd.GeoDataFrame, tags: Dict[str, List[str]] | None = N
 
 # Count POIs per Ortsteil and pivot into wide format
 def count_pois_per_ortsteil(gdf: gpd.GeoDataFrame) -> pd.DataFrame:
-    """Pivot counts: rows=ortsteil, columns=tag_value, values=count."""
+    """Count POIs per Ortsteil and pivot to wide format with tag_value columns.
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        GeoDataFrame containing POIs with 'ortsteil' and 'tag_value' columns.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame indexed by 'ortsteil' with counts of each POI type as columns.
+    """
     if gdf.empty:
         return pd.DataFrame({"ortsteil": []})
     piv = (
@@ -195,7 +254,20 @@ def count_pois_per_ortsteil(gdf: gpd.GeoDataFrame) -> pd.DataFrame:
 
 # Group related POI columns into aggregated categories
 def group_poi_columns(df_counts: pd.DataFrame, groups: Dict[str, List[str]] = GROUPED_COLUMNS) -> pd.DataFrame:
-    """Optional: create grouped columns and drop sources when present."""
+    """Aggregate related POI columns into grouped categories and drop original columns.
+
+    Parameters
+    ----------
+    df_counts : pandas.DataFrame
+        DataFrame with POI counts per Ortsteil and individual POI columns.
+    groups : dict, optional
+        Mapping of new grouped column names to lists of source columns, by default GROUPED_COLUMNS
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with grouped POI columns added and source columns removed.
+    """
     df = df_counts.copy()
     for new_col, cols in groups.items():
         exist = [c for c in cols if c in df.columns]
@@ -207,6 +279,18 @@ def group_poi_columns(df_counts: pd.DataFrame, groups: Dict[str, List[str]] = GR
 # 5) Merge with master table
 # Normalize Ortsteil names (lowercase, replace umlauts/ß)
 def normalize_ortsteil_name(name: str | float) -> str:
+    """Normalize Ortsteil names by lowercasing and replacing German umlauts and ß.
+
+    Parameters
+    ----------
+    name : str or float
+        Ortsteil name to normalize.
+
+    Returns
+    -------
+    str
+        Normalized Ortsteil name.
+    """
     if pd.isna(name):
         return ""
     s = str(name).lower().strip()
@@ -216,6 +300,20 @@ def normalize_ortsteil_name(name: str | float) -> str:
 
 # Merge POI counts with the master dataframe by Ortsteil
 def merge_poi_to_master(df_master: pd.DataFrame, df_counts: pd.DataFrame) -> pd.DataFrame:
+    """Merge POI count data into the master DataFrame by normalized Ortsteil names.
+
+    Parameters
+    ----------
+    df_master : pandas.DataFrame
+        Master DataFrame containing an 'ortsteil' column.
+    df_counts : pandas.DataFrame
+        DataFrame with POI counts per Ortsteil.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Merged DataFrame with POI counts added; missing counts filled with zero.
+    """
     m = df_master.copy()
     p = df_counts.copy()
     m["ortsteil_norm"] = m["ortsteil"].map(normalize_ortsteil_name)
