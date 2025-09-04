@@ -1,4 +1,10 @@
-# Run from repo root:  python tables_builder.py --all
+# Run from repo root:  python scripts/tables.py --all
+"""
+This script builds Berlin Housing master tables (Bezirk, Ortsteil, Final) from raw or cleaned data sources.
+It processes, enriches, and merges various datasets to produce comprehensive master tables, and saves the outputs
+to specified locations. The script can be run as a command-line interface (CLI) with argparse options to build
+individual tables (--bezirk, --ortsteil, --final) or all tables at once (--all).
+"""
 
 # Imports
 from __future__ import annotations
@@ -25,7 +31,8 @@ from berlin_housing.poi import (
     merge_poi_to_master,
 )
 
-# Tourism helpers (robust to header variations)
+# - Tourism Helpers -
+# Select a column name from candidates in colnames, allowing substrings if needed
 def _pick(colnames, candidates, allow_substring=True):
     cols = list(colnames)
     lower_map = {c.lower(): c for c in cols}
@@ -40,6 +47,7 @@ def _pick(colnames, candidates, allow_substring=True):
                     return c
     raise KeyError(f"None of {candidates} found in columns: {cols}")
 
+# Load and merge tourism data frames for overnight stays and guests
 def load_tourism_frames(totals_path, changes_path):
     totals = pd.read_csv(totals_path)
     changes = pd.read_csv(changes_path)
@@ -66,7 +74,8 @@ def load_tourism_frames(totals_path, changes_path):
     guests = totals_mini[["Bezirke", "Guests"]]
     return overnight_stays, guests
 
-# Builders
+# - Builder Helpers -
+# Build the Bezirk master table by enriching various datasets
 def build_bezirk_master() -> pd.DataFrame:
     bridges   = pd.read_csv(config.BRIDGES_CSV)
     cinemas   = pd.read_csv(config.CINEMAS_CSV)
@@ -94,15 +103,8 @@ def build_bezirk_master() -> pd.DataFrame:
     )
     return df
 
+# Build Ortsteil base and POI-enriched master tables
 def build_ortsteil_master() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Build Ortsteil base table and a POI-enriched variant.
-
-    Workflow:
-      1) Build base (population × rent/income)
-      2) Get POI counts per Ortsteil: load if available, else scrape
-      3) Optionally group POI columns (cafes/green_space/medical/...)
-      4) Merge with base using poi.merge_poi_to_master
-    """
     logger = logging.getLogger(__name__)
 
     # 1) Base table
@@ -147,18 +149,19 @@ def build_ortsteil_master() -> tuple[pd.DataFrame, pd.DataFrame]:
 
     return base, enriched
 
+# Build the final master table from the POI-enriched Ortsteil table
 def build_final_master(ortsteil_with_poi: pd.DataFrame) -> pd.DataFrame:
     # Final master currently equals Ortsteil master enriched with POIs
     return ortsteil_with_poi.copy()
 
-# Save helpers
+# Save a DataFrame to CSV and print confirmation
 def save_outputs(name: str, df: pd.DataFrame, path_csv: str):
     os.makedirs(os.path.dirname(path_csv), exist_ok=True)
     df.to_csv(path_csv, index=False)
     print(f"✓ Saved {name}: {df.shape[0]:,} rows × {df.shape[1]:,} cols")
     print(f"  - {path_csv}")
 
-# CLI 
+# Command-line interface to build selected master tables
 def main():
     ap = argparse.ArgumentParser(description="Build Berlin Housing master tables from raw data.")
     ap.add_argument("--bezirk", action="store_true", help="Build only bezirk master.")

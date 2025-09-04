@@ -1,3 +1,8 @@
+"""This script provides a Typer-based CLI for scraping POIs, cleaning and merging Ortsteil data,
+and building master datasets for the Berlin Housing project.
+"""
+
+# Imports
 from pathlib import Path
 import typer
 import geopandas as gpd
@@ -14,12 +19,13 @@ from berlin_housing.poi import (
 
 app = typer.Typer(help="CLI for scraping POIs and building Ortsteil master datasets")
 
+# Sets up logging configuration based on the provided verbosity level.
 def setup_logging(verbosity: int = 1) -> None:
-    """Configure basic console logging based on verbosity level (0=WARNING, 1=INFO, 2+=DEBUG)."""
     level = logging.WARNING if verbosity <= 0 else (logging.INFO if verbosity == 1 else logging.DEBUG)
     logging.basicConfig(level=level, format="%(levelname)s: %(message)s")
 
 @app.command()
+# Scrapes POIs for each Ortsteil, saves raw data and aggregated POI counts.
 def scrape_poi_all(
     boundaries_path: Path = typer.Option(..., help="GeoJSON of Ortsteil polygons"),
     ortsteil_col: str = typer.Option("OTEIL"),
@@ -40,6 +46,7 @@ def scrape_poi_all(
     typer.echo(f"✅ Saved raw to {out_raw} and counts to {out_counts}")
 
 @app.command()
+# Merges the cleaned Ortsteil master table with POI counts/features.
 def merge_poi_master(
     master_path: Path = typer.Option(..., help="Cleaned ortsteil table CSV/Parquet"),
     poi_counts_path: Path = typer.Option(...),
@@ -54,12 +61,12 @@ def merge_poi_master(
     typer.echo(f"✅ Wrote merged master+POI to {out_path}")
 
 @app.command()
+# Cleans raw Ortsteil data and saves a standardized version.
 def clean_ortsteil(
     input_path: Path = typer.Option(..., help="Raw Ortsteil-level CSV/Parquet"),
     output_path: Path = typer.Option("data/cleaned_data/berlin_ortsteil_table.parquet"),
     verbose: int = typer.Option(1),
 ):
-    """Clean raw subdistrict (Ortsteil) data and save a standardized table."""
     setup_logging(verbose)
     df = load_table(input_path)
     out = clean_ortsteil_tables(df)
@@ -68,13 +75,13 @@ def clean_ortsteil(
 
 
 @app.command()
+# Builds the master dataset by merging Ortsteil data with optional POI counts.
 def build_dataset(
     ortsteil_path: Path = typer.Option(..., help="Cleaned Ortsteil table (CSV/Parquet)"),
     poi_counts_path: Path = typer.Option(None, help="POI counts per Ortsteil (CSV/Parquet)"),
     output_path: Path = typer.Option("data/processed/ortsteil_master.parquet"),
     verbose: int = typer.Option(1),
 ):
-    """Merge cleaned Ortsteil data with optional POI counts into a single master dataset."""
     setup_logging(verbose)
     ortsteil_df = load_table(ortsteil_path)
     if poi_counts_path is not None:

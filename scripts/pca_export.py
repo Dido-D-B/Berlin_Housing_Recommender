@@ -1,3 +1,6 @@
+"""Perform PCA on the final master dataset and save reduced features for modeling and visualization."""
+
+# Imports
 import pandas as pd
 import numpy as np
 from __future__ import annotations
@@ -6,10 +9,12 @@ from berlin_housing.features import add_sanity_checks, engineer_features, select
 from berlin_housing.preprocessing import make_preprocessor, fit_transform_preprocessor
 from berlin_housing.pca import pca_2d_for_viz, pca_until_variance
 
+# Paths
 IN_PATH  = "data/processed/final_master.csv"
 OUT_DIR  = "data/modeling/berlin_pca"
 OUT_NAME = "berlin_subdistricts_pca.csv"
 
+# Main function to perform PCA and save the results
 def main():
     df = pd.read_csv(IN_PATH)
 
