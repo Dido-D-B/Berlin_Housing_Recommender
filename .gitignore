@@ -1,0 +1,49 @@
+# - Python -
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.joblib
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+.profile_default/
+ipython_config.py
+
+# - Data science -
+# Large data files should be kept locally, not in Git
+data/raw/
+data/interim/
+data/cache/
+cache/
+*.h5
+*.hdf5
+*.parquet
+*.csv
+*.tsv
+
+# - Streamlit -
+.streamlit/secrets.toml  # keep local secrets safe
+.streamlit/cache/
+cache/
+
+# - VSCode / IDE -
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# - Logs / outputs -
+*.log
+logs/
+mlruns/          # MLflow runs

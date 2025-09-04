@@ -14,6 +14,7 @@ import os
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(REPO_ROOT, "data")
+RAW_DIR = os.path.join(DATA_DIR, "raw")
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
 
 # Global flags
@@ -22,22 +23,22 @@ PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
 FORCE_SCRAPE_POI = True
 
 # District-level (Bezirk)
-BRIDGES_CSV      = os.path.join(DATA_DIR, "berlin_bridges.csv")
-CINEMAS_CSV      = os.path.join(DATA_DIR, "berlin_cinemas.csv")
-LIBRARIES_CSV    = os.path.join(DATA_DIR, "berlin_libraries_2023.csv")
-CARS_CSV         = os.path.join(DATA_DIR, "berlin_passenger_cars.csv")
-TOILETS_CSV      = os.path.join(DATA_DIR, "berlin_public_toilets.csv")
-TREES_CSV        = os.path.join(DATA_DIR, "berlin_trees.csv")
-CENSUS_DISTRICT  = os.path.join(DATA_DIR, "berlin_census_2022.csv")
-TOURISM_TOTALS   = os.path.join(DATA_DIR, "berlin_tourism_guests_overnightstays_2023_2024.csv")
-TOURISM_CHANGES  = os.path.join(DATA_DIR, "berlin_tourism_overnightstays_changes_2023_2024.csv")
+BRIDGES_CSV      = os.path.join(RAW_DIR, "berlin_bridges.csv")
+CINEMAS_CSV      = os.path.join(RAW_DIR, "berlin_cinemas.csv")
+LIBRARIES_CSV    = os.path.join(RAW_DIR, "berlin_libraries_2023.csv")
+CARS_CSV         = os.path.join(RAW_DIR, "berlin_passenger_cars.csv")
+TOILETS_CSV      = os.path.join(RAW_DIR, "berlin_public_toilets.csv")
+TREES_CSV        = os.path.join(RAW_DIR, "berlin_trees.csv")
+CENSUS_DISTRICT  = os.path.join(RAW_DIR, "berlin_census_2022.csv")
+TOURISM_TOTALS   = os.path.join(RAW_DIR, "berlin_tourism_guests_overnightstays_2023_2024.csv")
+TOURISM_CHANGES  = os.path.join(RAW_DIR, "berlin_tourism_overnightstays_changes_2023_2024.csv")
 
 # Ortsteil-level
-ORTS_POP_CSV     = os.path.join(DATA_DIR, "berlin_ortsteil_population.csv")  # or use subdistrict_2020 file
-ORTS_RI_CSV      = os.path.join(DATA_DIR, "berlin_ortsteil_rent_income.csv")
+ORTS_POP_CSV     = os.path.join(RAW_DIR, "berlin_ortsteil_population.csv")  # or use subdistrict_2020 file
+ORTS_RI_CSV      = os.path.join(RAW_DIR, "berlin_ortsteil_rent_income.csv")
 
 # Ortsteil boundaries for POI scraper
-ORTSTEIL_BOUNDARIES_PATH = os.path.join(DATA_DIR, "berlin_ortsteil_boundaries.geojson")
+ORTSTEIL_BOUNDARIES_PATH = os.path.join(RAW_DIR, "berlin_ortsteil_boundaries.geojson")
 ORSTEIL_NAME_FALLBACKS = ["OTEIL", "Ortsteil", "ORT_NAME", "name"]  # tried in this order
 ORTSTEIL_NAME_COLUMN = "OTEIL"  # preferred name; builder may fall back to the list above
 
