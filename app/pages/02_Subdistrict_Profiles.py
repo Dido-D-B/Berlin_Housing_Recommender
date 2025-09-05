@@ -164,7 +164,7 @@ try:
         pickable=False,
         stroked=True,
         filled=False,
-        get_line_color=[150, 150, 150, 180],
+        get_line_color=[150, 150, 150, MAP_OPACITY],
         line_width_min_pixels=1,
     )
 
@@ -226,7 +226,7 @@ try:
         filled=True,
         extruded=False,
         get_fill_color="properties.fill_color",
-        get_line_color=[200, 140, 0, 140],
+        get_line_color=[200, 140, 0, MAP_OPACITY],
         line_width_min_pixels=1,
     )
     tooltip = {
