@@ -122,7 +122,7 @@ for i, lbl in enumerate(labels_to_show):
 MAP_HEIGHT = 650  # Height for the map canvas
 GEO_PATH = os.path.join(PROJECT_ROOT, "data", "static", "berlin_ortsteil_boundaries.parquet")
 # Fixed opacity for subdistrict profile fill colors (RGBA alpha)
-MAP_OPACITY = 110
+MAP_OPACITY = 90
 
 try:
     gj = load_geojson(GEO_PATH)
