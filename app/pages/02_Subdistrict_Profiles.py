@@ -121,7 +121,7 @@ for i, lbl in enumerate(labels_to_show):
 
 # Map
 MAP_HEIGHT = 650  # Height for the map canvas
-GEO_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "berlin_ortsteil_boundaries.geojson")
+GEO_PATH = os.path.join(PROJECT_ROOT, "data", "static", "berlin_ortsteil_boundaries_light.geojson")
 
 try:
     gj = load_geojson(GEO_PATH)
