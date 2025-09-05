@@ -97,14 +97,8 @@ with st.sidebar:
     if selected_ort_disp and selected_ort_disp != "All subdistricts":
         sel_raw = DISP2RAW.get(selected_ort_disp, selected_ort_disp)
 
-    # Map style
-    map_opacity = st.slider(
-        "Map fill opacity",
-        min_value=30,
-        max_value=220,
-        value=110,
-        help="Adjust polygon fill transparency (higher = more opaque).",
-    )
+    # Fixed map opacity (no slider)
+    map_opacity = 110
 
 # Filter the frame
 mask = df["k4_cluster"].isin(clusters)
