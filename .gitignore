@@ -20,17 +20,18 @@ env/
 .profile_default/
 ipython_config.py
 
-# - Data science -
-# Large data files should be kept locally, not in Git
+# large geodata
+data/cleaned_data/*.geojson
+data_all/cleaned_data/*.geojson
+
+# common large dirs
 data/raw/
-data/interim/
-data/cache/
-cache/
-*.h5
-*.hdf5
-*.parquet
-*.csv
-*.tsv
+data/processed/
+data_all/
+.cache/
+**/.ipynb_checkpoints/
+venv/
+.venv/
 
 # - Streamlit -
 .streamlit/secrets.toml  # keep local secrets safe
