@@ -97,8 +97,6 @@ with st.sidebar:
     if selected_ort_disp and selected_ort_disp != "All subdistricts":
         sel_raw = DISP2RAW.get(selected_ort_disp, selected_ort_disp)
 
-    # Fixed map opacity (no slider)
-    map_opacity = 110
 
 # Filter the frame
 mask = df["k4_cluster"].isin(clusters)
@@ -123,6 +121,8 @@ for i, lbl in enumerate(labels_to_show):
 # Map
 MAP_HEIGHT = 650  # Height for the map canvas
 GEO_PATH = os.path.join(PROJECT_ROOT, "data", "static", "berlin_ortsteil_boundaries.parquet")
+# Fixed opacity for subdistrict profile fill colors (RGBA alpha)
+MAP_OPACITY = 110
 
 try:
     gj = load_geojson(GEO_PATH)
@@ -189,7 +189,7 @@ try:
         rec = LUT.get(name_key, {})
 
         rgb = CLUSTER_PALETTE.get(cl, [180, 180, 180])
-        color = rgb + [int(map_opacity)]
+        color = rgb + [int(MAP_OPACITY)]
         props = dict(props)
         # Enrich properties for tooltip
         props["fill_color"] = color
