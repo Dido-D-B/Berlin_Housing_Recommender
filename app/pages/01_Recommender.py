@@ -28,7 +28,7 @@ if PROJECT_ROOT not in sys.path:
 
 # Imports
 import streamlit as st
-from services.recommender import get_top_k, estimate_required_sqm
+from app.utils.recommender import get_top_k, estimate_required_sqm
 from berlin_housing.config import DEFAULT_CLUSTER_COL
 from utils.bookmarks import add_bookmark, remove_bookmark, is_bookmarked
 from utils.text import de_pretty

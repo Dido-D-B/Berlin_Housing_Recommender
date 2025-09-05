@@ -1,28 +1,57 @@
 import geopandas as gpd
 from pathlib import Path
 
-SRC = Path("data/raw/berlin_ortsteil_boundaries.geojson")   # your current big file
-OUT_DIR = Path("data/static"); OUT_DIR.mkdir(parents=True, exist_ok=True)
+SRC = Path("data/raw/berlin_ortsteil_boundaries.geojson")  # rich source (has attributes)
+OUT = Path("data/static/berlin_ortsteil_boundaries.parquet")
+OUT.parent.mkdir(parents=True, exist_ok=True)
 
-# Load & standardize
 gdf = gpd.read_file(SRC).to_crs(4326)
 
-# Keep only columns the app needs (adjust names to your schema)
-keep_cols = ["ortsteil_id", "ortsteil_name", "bezirk_name", "geometry"]
-gdf = gdf[[c for c in keep_cols if c in gdf.columns]]
+# pick a name column that exists in your source (includes your file's fields)
+CANDIDATES = [
+    "OTEIL",           # Ortsteil name (seen in your file)
+    "spatial_alias",   # human-readable alias (also seen)
+    "Ortsteil",
+    "GEN",
+    "name",
+    "BEZIRK",         # district name (fallback; not ideal for Ortsteil)
+    "BEZ",
+]
 
-# Simplify geometry (≈ 30–50m). Increase tolerance if still too big.
-gdf["geometry"] = gdf.geometry.simplify(tolerance=0.0004, preserve_topology=True)
+name_col = None
+for cand in CANDIDATES:
+    if cand in gdf.columns:
+        name_col = cand
+        break
 
-# Fix any invalid polygons after simplify
-gdf["geometry"] = gdf.buffer(0)
+if name_col is None:
+    print("Available columns:", list(gdf.columns))
+    raise ValueError("No suitable name column found. Update CANDIDATES with one of the columns above.")
 
-# Save as GeoParquet (best for the app)
-parquet_path = OUT_DIR / "berlin_ortsteil_boundaries.parquet"
-gdf.to_parquet(parquet_path)
+# create a normalized slug column to match df['ortsteil']
+_UMLAUT = str.maketrans({"ä":"ae","ö":"oe","ü":"ue","ß":"ss","Ä":"Ae","Ö":"Oe","Ü":"Ue"})
+_DASHES = {"\u2013": "-", "\u2014": "-", "\u2212": "-"}
 
-# Also export a lighter GeoJSON if you need it for other tools
-geojson_path = OUT_DIR / "berlin_ortsteil_boundaries_light.geojson"
-gdf.to_file(geojson_path, driver="GeoJSON")
+def norm_slug(x):
+    t = (str(x) or "").strip().lower().translate(_UMLAUT)
+    for a, b in _DASHES.items():
+        t = t.replace(a, b)
+    return " ".join(t.split())  # collapse spaces
 
-print("Saved:", parquet_path, geojson_path)
+# Prefer OTEIL/spatial_alias as display name if present
+if "OTEIL" in gdf.columns:
+    display_col = "OTEIL"
+elif "spatial_alias" in gdf.columns:
+    display_col = "spatial_alias"
+else:
+    display_col = name_col
+
+gdf["ortsteil_slug"] = gdf[name_col].astype(str).map(norm_slug)
+
+# Keep only what the app needs (slug + a human-readable display name)
+keep = ["ortsteil_slug", display_col, "geometry"]
+# If display_col duplicates slug source but has another good label, it's fine
+keep = list(dict.fromkeys(keep))  # dedupe
+
+gdf[keep].to_parquet(OUT)
+print("Saved:", OUT, "with columns:", keep)

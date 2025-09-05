@@ -11,14 +11,15 @@ This page:
 - Includes an "About this assistant" section to explain scope and limitations
 """
 
-# Ensure the *repository root* (the parent of the `app/` folder) is on sys.path so `import app...` works
 import os, sys
+import pathlib
+
+# Ensure the *repository root* (the parent of the `app/` folder) is on sys.path so `import app...` works
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]  # .../Berlin_Housing_Affordability
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 # Imports
-import pathlib
 import streamlit as st
 from utils.ui import inject_responsive_css, render_footer
 from app.utils.content import build_corpus, retrieve, synthesize_answer, citation_line

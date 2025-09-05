@@ -15,8 +15,71 @@ This module provides helpers to:
 import os
 import pandas as pd
 from typing import List
+from typing import Dict, Iterable, Set, Tuple
 from utils.text import normalize_filename_base as _normalize_filename_base, district_slug, norm
 from copy import deepcopy
+
+# --- Unified geo helpers (merged) ---
+# Common property keys for Ortsteil names in GeoJSONs
+NAME_KEYS = ("ortsteil", "OTEIL", "Ortsteil", "ortsteil_name", "GEN", "BEZ", "name", "spatial_alias", "bez_name")
+
+def load_geojson(path: str):
+    """
+    Load a boundary file from either GeoJSON (*.geojson/*.json) or GeoParquet (*.parquet)
+    and return a GeoJSON-like dict (FeatureCollection).
+    """
+    import os, json
+    p = str(path)
+    ext = os.path.splitext(p)[1].lower()
+    if ext == ".parquet":
+        try:
+            import geopandas as gpd
+        except Exception as e:
+            raise RuntimeError("geopandas is required to read .parquet boundary files") from e
+        gdf = gpd.read_parquet(p)
+        return json.loads(gdf.to_json())
+    with open(p, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def feature_name(props: Dict) -> str:
+    """
+    Extract the Ortsteil (subdistrict) name from a GeoJSON feature's properties.
+
+    Tries multiple known property keys (`ortsteil`, `Ortsteil`, `ortsteil_name`, etc.).
+    If not found, searches nested dictionaries and finally returns the first non-empty string value.
+    """
+    # Prefer keys we commonly see
+    for k in NAME_KEYS:
+        if k in props and props[k]:
+            return str(props[k]).strip()
+    # Sometimes nested dicts contain the label
+    for v in props.values():
+        if isinstance(v, dict):
+            for k in NAME_KEYS:
+                if k in v and v[k]:
+                    return str(v[k]).strip()
+    # Fallback: first non-empty string value
+    for v in props.values():
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+    return ""
+
+def subset_by_names(gj: Dict, allowed_names: Iterable[str]) -> Tuple[Dict, Set[str]]:
+    """
+    Create a subset of a GeoJSON FeatureCollection filtered by allowed names.
+
+    Returns (subset_feature_collection, matched_name_keys)
+    """
+    allowed: Set[str] = {norm(x) for x in allowed_names if x}
+    feats, matched = [], set()
+    for ft in gj.get("features", []):
+        props = ft.get("properties", {}) or {}
+        fname = feature_name(props) or pick_feature_name(props)
+        key = norm(fname)
+        if key in allowed:
+            feats.append(ft)
+            matched.add(key)
+    return {"type": "FeatureCollection", "features": feats}, matched
 
 # Image directory resolution: default to streamlit_app/images unless DISTRICT_IMAGES_DIR is set.
 _BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -94,19 +157,27 @@ def find_coords_columns(df: pd.DataFrame):
 # Pick a human-readable feature name from GeoJSON properties using common keys.
 def pick_feature_name(props: dict) -> str:
     """
-    Pick a human-readable feature name from GeoJSON properties.
-
-    Tries common keys (e.g., 'ortsteil', 'Ortsteil', 'name', 'spatial_alias', 'bez_name').
-
-    Args:
-        props (dict): Feature properties.
-
-    Returns:
-        str: The found name or an empty string.
+    Return the best display name for a GeoJSON feature based on common keys
+    found in Berlin Ortsteil boundary files. Falls back gracefully.
     """
-    for k in ("ortsteil", "OTEIL", "Ortsteil", "name", "spatial_alias", "bez_name"):
+    if not isinstance(props, dict):
+        return ""
+    # Preferred keys (ordered)
+    candidates = [
+        "ortsteil",          # normalized lower-case
+        "Ortsteil",          # title case
+        "ortsteil_name",     # simplified/parquet export
+        "GEN",               # common in DE datasets
+        "name",              # generic
+        "BEZ",               # sometimes used
+    ]
+    for k in candidates:
         if k in props and props[k]:
-            return str(props[k])
+            return str(props[k]).strip()
+    # Fallback: first non-empty string value
+    for v in props.values():
+        if isinstance(v, str) and v.strip():
+            return v.strip()
     return ""
 
 # Resolve the Ortsteil GeoJSON path by checking a few common project locations.
@@ -146,13 +217,10 @@ def colorize_geojson_by_cluster(geojson_fc: dict, ortsteil_to_cluster: dict, pal
     fc = {"type": "FeatureCollection", "features": []}
     for ft in geojson_fc.get("features", []):
         props = dict(ft.get("properties", {}) or {})
-        name = ""
-        for k in ("ortsteil", "OTEIL", "Ortsteil", "name", "spatial_alias", "bez_name"):
-            if k in props and props[k]:
-                name = str(props[k]); break
+        name = feature_name(props) or pick_feature_name(props)
         cl = ortsteil_to_cluster.get(norm(name))
         rgb = palette.get(cl, [180, 180, 180])
-        props["fill_color"] = rgb + [80]
+        props["fill_color"] = rgb + [180]  # higher alpha so fills are clearly visible
         props["k4_cluster"] = cl
         new_ft = dict(ft)
         new_ft["properties"] = props

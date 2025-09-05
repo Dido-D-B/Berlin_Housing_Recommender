@@ -21,12 +21,10 @@ if PROJECT_ROOT not in sys.path:
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
-from berlin_housing.io import load_master
-from services.geo import load_geojson, subset_by_names, norm
 from utils.constants import CLUSTER_NAMES as CLUSTER_LABELS, CLUSTER_NOTES, CLUSTER_PALETTE, LABEL_TO_ID
-from utils.geo import pick_feature_name
+from utils.geo import load_geojson, norm, pick_feature_name, feature_name
 from utils.ui import build_profiles_table, render_footer, inject_responsive_css
-from utils.content import get_district_blurb, get_subdistrict_blurb, get_image_credit
+from utils.content import get_district_blurb, get_subdistrict_blurb
 from utils.data import _load
 from utils.text import format_german_title
 
@@ -121,12 +119,44 @@ for i, lbl in enumerate(labels_to_show):
 
 # Map
 MAP_HEIGHT = 650  # Height for the map canvas
-GEO_PATH = os.path.join(PROJECT_ROOT, "data", "static", "berlin_ortsteil_boundaries_light.geojson")
+GEO_PATH = os.path.join(PROJECT_ROOT, "data", "static", "berlin_ortsteil_boundaries.parquet")
 
 try:
     gj = load_geojson(GEO_PATH)
-    # Filter geojson to the subset of displayed Ortsteile
-    subset, matched = subset_by_names(gj, df_filt["ortsteil"].unique())
+    # --- DEBUG: show how names compare between boundaries and dataframe ---
+    try:
+        # Collect a sample of names from the boundary file
+        boundary_names = []
+        for ft in gj.get("features", [])[:120]:
+            props = ft.get("properties", {}) or {}
+            nm = feature_name(props) or pick_feature_name(props)
+            if nm:
+                boundary_names.append(str(nm))
+        # Collect names from the dataframe
+        df_names = df["ortsteil"].dropna().astype(str).tolist()
+        # Normalize for comparison
+        boundary_keys = {norm(x) for x in boundary_names}
+        df_keys = {norm(x) for x in df_names}
+        only_in_boundary = sorted(list(boundary_keys - df_keys))[:20]
+        only_in_df = sorted(list(df_keys - boundary_keys))[:20]
+        # Show in an expander
+        with st.expander("🔎 Debug: boundary vs dataframe names", expanded=False):
+            st.write("Boundary sample (first 20):", boundary_names[:20])
+            st.write("DF sample (first 20):", df_names[:20])
+            st.write(
+                "Counts — boundaries:", len(boundary_keys),
+                " | df:", len(df_keys),
+                " | intersection:", len(boundary_keys & df_keys),
+            )
+            if only_in_boundary:
+                st.write("Only in boundary (first 20):", only_in_boundary)
+            if only_in_df:
+                st.write("Only in dataframe (first 20):", only_in_df)
+    except Exception as _dbg_e:
+        st.caption(f"Debug name check failed: {_dbg_e}")
+    # Decide which features to include based on current filter
+    allowed = set(df_filt["ortsteil"].astype(str).apply(lambda x: norm(x)).unique().tolist())
+    include_all = (len(allowed) == 0) or (len(allowed) == len(df["ortsteil"].astype(str).unique()))
 
     # Prepare lookups for tooltip enrichment
     pop_col = "total_population" if "total_population" in df.columns else None
@@ -156,17 +186,20 @@ try:
 
     missing_names = []
 
-    # Attach color per feature based on its cluster
+    # Attach color per feature based on its cluster, filtering using allowed set
     subset_colored = {"type": "FeatureCollection", "features": []}
-    for ft in subset.get("features", []):
+    for ft in gj.get("features", []):
+        # Skip features not in the current allowed set (unless showing all)
         props = ft.get("properties", {}) or {}
-        orig_name = pick_feature_name(props)
-        name_key = norm(orig_name)
+        orig_name = feature_name(props) or pick_feature_name(props)
+        name_key = norm(str(orig_name))
+        if not include_all and name_key not in allowed:
+            continue
         cl = o2c.get(name_key)
         rec = LUT.get(name_key, {})
 
         rgb = CLUSTER_PALETTE.get(cl, [180, 180, 180])
-        color = rgb + [80]  # add alpha
+        color = rgb + [180]  # higher alpha for visible fills
         props = dict(props)
         # Enrich properties for tooltip
         props["fill_color"] = color
