@@ -1,5 +1,7 @@
 # Berlin Housing Affordability Project
 
+<img width="2936" height="1562" alt="image" src="https://github.com/user-attachments/assets/65b1abf6-d242-494a-b446-8ebd3cb4ca8f" />
+
 This project explores **where to live in Berlin** by combining housing affordability with lifestyle and subdistrict characteristics.  
 
 It integrates official open data, census statistics, and Mietspiegel (rent index) information with feature engineering and machine learning to build detailed **subdistrict profiles**.
