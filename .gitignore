@@ -33,6 +33,11 @@ data_all/
 venv/
 .venv/
 
+# Allow small static geometry for the app
+!data/static/
+!data/static/berlin_ortsteil_boundaries.parquet
+!data/static/berlin_ortsteil_boundaries_light.geojson
+
 # - Streamlit -
 .streamlit/secrets.toml  # keep local secrets safe
 .streamlit/cache/
