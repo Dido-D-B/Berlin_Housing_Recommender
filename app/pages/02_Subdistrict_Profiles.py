@@ -97,6 +97,15 @@ with st.sidebar:
     if selected_ort_disp and selected_ort_disp != "All subdistricts":
         sel_raw = DISP2RAW.get(selected_ort_disp, selected_ort_disp)
 
+    # Map style
+    map_opacity = st.slider(
+        "Map fill opacity",
+        min_value=30,
+        max_value=220,
+        value=110,
+        help="Adjust polygon fill transparency (higher = more opaque).",
+    )
+
 # Filter the frame
 mask = df["k4_cluster"].isin(clusters)
 if sel_raw:
@@ -139,19 +148,6 @@ try:
         df_keys = {norm(x) for x in df_names}
         only_in_boundary = sorted(list(boundary_keys - df_keys))[:20]
         only_in_df = sorted(list(df_keys - boundary_keys))[:20]
-        # Show in an expander
-        with st.expander("🔎 Debug: boundary vs dataframe names", expanded=False):
-            st.write("Boundary sample (first 20):", boundary_names[:20])
-            st.write("DF sample (first 20):", df_names[:20])
-            st.write(
-                "Counts — boundaries:", len(boundary_keys),
-                " | df:", len(df_keys),
-                " | intersection:", len(boundary_keys & df_keys),
-            )
-            if only_in_boundary:
-                st.write("Only in boundary (first 20):", only_in_boundary)
-            if only_in_df:
-                st.write("Only in dataframe (first 20):", only_in_df)
     except Exception as _dbg_e:
         st.caption(f"Debug name check failed: {_dbg_e}")
     # Decide which features to include based on current filter
@@ -199,7 +195,7 @@ try:
         rec = LUT.get(name_key, {})
 
         rgb = CLUSTER_PALETTE.get(cl, [180, 180, 180])
-        color = rgb + [180]  # higher alpha for visible fills
+        color = rgb + [int(map_opacity)]
         props = dict(props)
         # Enrich properties for tooltip
         props["fill_color"] = color
