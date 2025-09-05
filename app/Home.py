@@ -43,7 +43,7 @@ st.markdown(
     unsafe_allow_html=True)
 
 st.divider()
-st.markdown("""**Where to live in Berlin** - Find the right district for you! Use the recommender, explore subdistrict profiles, or deep-dive into the Berlin Census with an interactive dashboard.""")
+st.markdown("""**Where to live in Berlin** - Find the right subdistrict for you! Use the recommender, explore subdistrict profiles, or deep-dive into the Berlin Census with an interactive dashboard.""")
 st.divider()
 
 # Layout with image left and quick action buttons right
