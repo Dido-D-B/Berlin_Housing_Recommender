@@ -2,6 +2,8 @@
 
 <img width="2936" height="1562" alt="image" src="https://github.com/user-attachments/assets/65b1abf6-d242-494a-b446-8ebd3cb4ca8f" />
 
+---
+
 This project explores **where to live in Berlin** by combining housing affordability with lifestyle and subdistrict characteristics.  
 
 It integrates official open data, census statistics, and Mietspiegel (rent index) information with feature engineering and machine learning to build detailed **subdistrict profiles**.
@@ -119,29 +121,52 @@ Located in the `app/` folder. Multi-page app with:
 - Users input **income**, **household size**, and **preferences**.
 - Returns **recommended subdistricts** ranked by affordability and POI profile.
 
+<img width="1876" height="852" alt="image" src="https://github.com/user-attachments/assets/c8f0ed09-5c32-4400-94a4-b95a0f7d2801" />
+
+<img width="1392" height="1114" alt="image" src="https://github.com/user-attachments/assets/c18b1151-9798-4db2-af28-2ff7f4106de8" />
+
+
 ### **02_Subdistrict Profiles**
 - Interactive **map of Berlin** with tooltips.
 - Subdistrict-level deep dive: demographics, rents, POIs, cultural facts.
+
+<img width="1418" height="1272" alt="image" src="https://github.com/user-attachments/assets/72d607b5-4380-4c24-b637-15e5099dff97" />
+
 
 ### **03_Berlin Census**
 - Census 2022 data explorer.
 - Switch views (population, employment, etc.).
 
+<img width="1748" height="1236" alt="image" src="https://github.com/user-attachments/assets/9c1c3a88-dc8d-4726-a447-79c8ab3053f4" />
+
+
 ### **04_Behind the Data**
 - Transparency page: methodology, data sources, key insights from EDA.
 - Visualizations of PCA, clustering, and feature importance.
 
+<img width="1390" height="792" alt="image" src="https://github.com/user-attachments/assets/d7d547b3-ca22-4c71-881c-4e6cff38a757" />
+
+
 ### **98_Q&A**
 - Integrated “Explain This” helper for FAQs and glossary.
+
+<img width="1386" height="262" alt="image" src="https://github.com/user-attachments/assets/74268a0c-1122-4a34-afdd-c741117bfcab" />
+
 
 ### **99_Bookmarks**
 - User’s saved favorite subdistricts.
 
+<img width="1408" height="396" alt="image" src="https://github.com/user-attachments/assets/a9cab016-cd8a-4f3a-abf7-f686618a5790" />
+
+
 ## Tableau Dashboards
 
 Complementary dashboards (in `tableau/`) for storytelling:
-- Berlin Census 2022 story (population, employment, housing).
-- Interactive dashboards with annotations.
+- [Berlin Census 2022 story](https://public.tableau.com/app/profile/dido.de.boodt/viz/berlin_dashboard/BerlinHousingPopulation) (population, employment, housing).
+- [Interactive dashboards](https://public.tableau.com/app/profile/dido.deboodt) with annotations.
+
+<img width="2938" height="1798" alt="image" src="https://github.com/user-attachments/assets/dd3de5c1-6525-495e-8150-36e814a31d4f" />
+
 
 ## Getting Started
 
@@ -187,4 +212,3 @@ This project would not have been possible without the use of **open data provide
 - **VS Code** (for development and modular structuring)
 
 Special thanks to the open-source community for guidance and inspiration.
-
